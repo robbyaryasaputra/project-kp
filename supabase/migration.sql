@@ -85,3 +85,14 @@ CREATE POLICY "Allow public upload" ON storage.objects
 CREATE POLICY "Allow public read" ON storage.objects
   FOR SELECT
   USING (bucket_id = 'applicant-documents');
+
+-- Policy: Allow authenticated update to applicant-documents bucket
+CREATE POLICY "Allow authenticated update storage" ON storage.objects
+  FOR UPDATE
+  USING (auth.role() = 'authenticated');
+
+-- Policy: Allow authenticated delete from applicant-documents bucket
+CREATE POLICY "Allow authenticated delete storage" ON storage.objects
+  FOR DELETE
+  USING (auth.role() = 'authenticated');
+

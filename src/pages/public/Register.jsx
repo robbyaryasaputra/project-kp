@@ -14,29 +14,19 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
   FileText,
   User,
   MapPin,
   Upload,
   Loader2,
   CheckCircle2,
-  Copy,
   ArrowRight,
   ArrowLeft,
   Camera,
   CreditCard,
   Users,
-  Search,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const INITIAL_FORM = {
   family_card_number: "",
@@ -68,13 +58,12 @@ function generateRegistrationCode() {
 }
 
 export default function Register() {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(INITIAL_FORM);
   const [files, setFiles] = useState({ ktp: null, kk: null, photo: null });
   const [previews, setPreviews] = useState({ ktp: null, kk: null, photo: null });
   const [loading, setLoading] = useState(false);
-  const [successData, setSuccessData] = useState(null);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -201,9 +190,13 @@ export default function Register() {
 
       if (error) throw error;
 
-      setSuccessData({ registrationCode, nik: form.nik });
-      setShowSuccess(true);
       toast.success("Pendaftaran berhasil dikirim!");
+      navigate("/success", {
+        state: {
+          registrationCode,
+          fullName: form.full_name,
+        },
+      });
     } catch (err) {
       console.error(err);
       toast.error("Gagal mengirim pendaftaran: " + (err.message || "Terjadi kesalahan"));
@@ -212,20 +205,7 @@ export default function Register() {
     }
   };
 
-  const copyCode = () => {
-    navigator.clipboard.writeText(successData.registrationCode);
-    toast.success("Kode pendaftaran disalin!");
-  };
 
-  const resetForm = () => {
-    setForm(INITIAL_FORM);
-    setFiles({ ktp: null, kk: null, photo: null });
-    setPreviews({ ktp: null, kk: null, photo: null });
-    setStep(1);
-    setShowSuccess(false);
-    setSuccessData(null);
-    setErrors({});
-  };
 
   const stepIndicators = [
     { num: 1, label: "Data Diri", icon: User },
@@ -717,53 +697,7 @@ export default function Register() {
         </Card>
       )}
 
-      {/* Success Dialog */}
-      <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <div className="mx-auto w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
-              <CheckCircle2 className="w-8 h-8 text-emerald-500" />
-            </div>
-            <DialogTitle className="text-center">
-              Pendaftaran Berhasil!
-            </DialogTitle>
-            <DialogDescription className="text-center">
-              Simpan kode pendaftaran berikut untuk memantau status pendaftaran Anda.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="px-6 py-4">
-            <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4 text-center">
-              <p className="text-xs text-neutral-500 mb-1">Kode Pendaftaran</p>
-              <p className="text-2xl font-bold text-primary-600 tracking-wider font-mono">
-                {successData?.registrationCode}
-              </p>
-            </div>
-            <Button
-              variant="outline"
-              className="w-full mt-3"
-              onClick={copyCode}
-            >
-              <Copy className="w-4 h-4" />
-              Salin Kode
-            </Button>
-          </div>
-          <DialogFooter className="flex-col gap-2 sm:flex-col">
-            <Link to="/cek-status" className="w-full">
-              <Button className="w-full">
-                <Search className="w-4 h-4" />
-                Cek Status Pendaftaran
-              </Button>
-            </Link>
-            <Button
-              variant="ghost"
-              className="w-full"
-              onClick={resetForm}
-            >
-              Daftar Lagi
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+
     </div>
   );
 }

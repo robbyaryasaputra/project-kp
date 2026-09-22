@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { generateApprovalPDF } from "@/utils/pdfExport";
+import { generateApprovalPDF } from "@/lib/pdfGenerator";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

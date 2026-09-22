@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -47,7 +48,103 @@ import {
   Inbox,
 } from "lucide-react";
 
-export default function AdminDashboard() {
+function DashboardOverview({ stats, applicants }) {
+  return (
+    <div className="animate-fade-in space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-neutral-900">Dashboard</h1>
+        <p className="text-sm text-neutral-500 mt-1">
+          Ringkasan pendaftaran dan aktivitas verifikasi.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {[
+          [
+            "Menunggu Verifikasi",
+            stats.pending,
+            Clock,
+            "text-amber-500",
+            "bg-amber-50",
+          ],
+          [
+            "Disetujui",
+            stats.approved,
+            CheckCircle,
+            "text-emerald-500",
+            "bg-emerald-50",
+          ],
+          ["Ditolak", stats.rejected, XCircle, "text-red-500", "bg-red-50"],
+        ].map(([label, value, Icon, color, bg]) => (
+          <Card key={label} className="border-neutral-200/80">
+            <CardContent className="flex items-center gap-4 p-5">
+              <div
+                className={`w-11 h-11 rounded-xl ${bg} flex items-center justify-center`}
+              >
+                <Icon className={`w-5 h-5 ${color}`} />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-neutral-900">{value}</p>
+                <p className="text-xs text-neutral-500">{label}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Pendaftar Menunggu</CardTitle>
+            <CardDescription>
+              Antrean terbaru yang perlu ditinjau.
+            </CardDescription>
+          </div>
+          <Link
+            to="/admin/verifikasi"
+            className="inline-flex h-8 items-center rounded-md bg-primary-500 px-3 text-xs font-semibold text-white no-underline hover:bg-primary-600"
+          >
+            Buka Verifikasi
+          </Link>
+        </CardHeader>
+        <CardContent>
+          {applicants.length === 0 ? (
+            <p className="py-8 text-center text-sm text-neutral-400">
+              Tidak ada pendaftar yang menunggu verifikasi.
+            </p>
+          ) : (
+            <div className="divide-y divide-neutral-100">
+              {applicants.slice(0, 5).map((applicant) => (
+                <div
+                  key={applicant.id}
+                  className="flex items-center justify-between gap-4 py-3"
+                >
+                  <div className="min-w-0">
+                    <p className="font-medium text-neutral-800 truncate">
+                      {applicant.full_name}
+                    </p>
+                    <p className="text-xs text-neutral-500 font-mono">
+                      {applicant.registration_code}
+                    </p>
+                  </div>
+                  <Link
+                    to={`/admin/verify/${applicant.id}`}
+                    className="text-sm font-semibold text-primary-600 no-underline hover:text-primary-700"
+                  >
+                    Review
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+export default function AdminDashboard({ isVerification = false }) {
+  const navigate = useNavigate();
   const [applicants, setApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -173,10 +270,10 @@ export default function AdminDashboard() {
 
   const getGenderLabel = (g) => (g === 1 ? "Laki-laki" : "Perempuan");
   const getMaritalLabel = (m) =>
-    ({ 0: "Tidak Diketahui", 1: "Belum Kawin", 2: "Kawin", 3: "Cerai" }[m] ||
-    "-");
+    ({ 0: "Tidak Diketahui", 1: "Belum Kawin", 2: "Kawin", 3: "Cerai" })[m] ||
+    "-";
   const getPisatLabel = (p) =>
-    ({ 1: "Peserta", 2: "Suami", 3: "Istri", 4: "Anak" }[p] || "-");
+    ({ 1: "Peserta", 2: "Suami", 3: "Istri", 4: "Anak" })[p] || "-";
 
   const filteredApplicants = applicants.filter((a) => {
     const q = searchQuery.toLowerCase();
@@ -186,6 +283,10 @@ export default function AdminDashboard() {
       a.registration_code?.toLowerCase().includes(q)
     );
   });
+
+  if (!isVerification) {
+    return <DashboardOverview stats={stats} applicants={applicants} />;
+  }
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -256,7 +357,9 @@ export default function AdminDashboard() {
                 />
               </div>
               <Button variant="outline" size="icon" onClick={fetchApplicants}>
-                <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+                <RefreshCw
+                  className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
+                />
               </Button>
             </div>
           </div>
@@ -309,21 +412,32 @@ export default function AdminDashboard() {
                     <TableCell className="text-sm text-neutral-500">
                       {new Date(applicant.created_at).toLocaleDateString(
                         "id-ID",
-                        { day: "2-digit", month: "short", year: "numeric" }
+                        { day: "2-digit", month: "short", year: "numeric" },
                       )}
                     </TableCell>
                     <TableCell>
                       <Badge variant="warning">Pending</Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => openReview(applicant)}
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        Review
-                      </Button>
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => openReview(applicant)}
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          Quick
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            navigate(`/admin/verify/${applicant.id}`)
+                          }
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          Review
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -368,7 +482,10 @@ export default function AdminDashboard() {
                         "TTL",
                         `${selectedApplicant.birth_place}, ${selectedApplicant.birth_date}`,
                       ],
-                      ["Jenis Kelamin", getGenderLabel(selectedApplicant.gender)],
+                      [
+                        "Jenis Kelamin",
+                        getGenderLabel(selectedApplicant.gender),
+                      ],
                       [
                         "Status Kawin",
                         getMaritalLabel(selectedApplicant.marital_status),
@@ -386,7 +503,7 @@ export default function AdminDashboard() {
                       [
                         "Tgl Daftar",
                         new Date(
-                          selectedApplicant.created_at
+                          selectedApplicant.created_at,
                         ).toLocaleDateString("id-ID", {
                           day: "2-digit",
                           month: "long",
@@ -448,9 +565,7 @@ export default function AdminDashboard() {
                                 e.target.nextSibling.style.display = "flex";
                               }}
                             />
-                            <div
-                              className="hidden w-full h-40 rounded-lg border border-neutral-200 bg-neutral-50 items-center justify-center text-neutral-400 text-sm"
-                            >
+                            <div className="hidden w-full h-40 rounded-lg border border-neutral-200 bg-neutral-50 items-center justify-center text-neutral-400 text-sm">
                               Gagal memuat gambar
                             </div>
                           </a>
@@ -537,9 +652,7 @@ export default function AdminDashboard() {
                       Tolak Pendaftaran
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-red-800">
-                        Alasan Penolakan *
-                      </Label>
+                      <Label className="text-red-800">Alasan Penolakan *</Label>
                       <Textarea
                         placeholder="Masukkan alasan penolakan..."
                         value={rejectionReason}

@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   FileSpreadsheet,
+  ClipboardCheck,
   LogOut,
   Shield,
   Menu,
@@ -35,8 +36,13 @@ export default function AdminLayout() {
   const navLinks = [
     {
       to: "/admin/dashboard",
-      label: "Dashboard Verifikasi",
+      label: "Dashboard",
       icon: LayoutDashboard,
+    },
+    {
+      to: "/admin/verifikasi",
+      label: "Verifikasi Pendaftar",
+      icon: ClipboardCheck,
     },
     {
       to: "/admin/rekap",
@@ -76,9 +82,7 @@ export default function AdminLayout() {
               <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-sm font-bold leading-tight">
-                Admin Panel
-              </h2>
+              <h2 className="text-sm font-bold leading-tight">Admin Panel</h2>
               <p className="text-[11px] text-neutral-400 leading-tight">
                 BPJS Kesehatan
               </p>
@@ -145,8 +149,7 @@ export default function AdminLayout() {
             <Menu className="w-5 h-5 text-neutral-600" />
           </button>
           <div className="hidden lg:block text-sm font-medium text-neutral-600">
-            {navLinks.find((l) => l.to === location.pathname)?.label ||
-              "Admin"}
+            {navLinks.find((l) => l.to === location.pathname)?.label || "Admin"}
           </div>
           <Link
             to="/"
