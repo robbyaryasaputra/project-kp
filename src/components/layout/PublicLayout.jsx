@@ -261,7 +261,7 @@ export default function PublicLayout() {
       </header>
 
       {/* Main Content with Immediate, Non-Blocking GPU Fade Entrance */}
-      <main className="flex-1">
+      <main className="min-w-0 flex-1">
         <motion.div
           key={location.pathname}
           initial={{ opacity: 0 }}
