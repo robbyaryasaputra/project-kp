@@ -8,6 +8,7 @@ import {
   Users,
   Clock,
   BadgeCheck,
+  UserPlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,8 +18,11 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LandingPage() {
+  const { user } = useAuth();
+
   const features = [
     {
       icon: FileText,
@@ -53,18 +57,18 @@ export default function LandingPage() {
   const steps = [
     {
       step: "01",
+      title: "Buat Akun",
+      description: "Daftar akun portal untuk mengakses layanan pendaftaran BPJS.",
+    },
+    {
+      step: "02",
       title: "Isi Formulir",
       description: "Lengkapi data diri dan informasi kepesertaan Anda.",
     },
     {
-      step: "02",
+      step: "03",
       title: "Upload Dokumen",
       description: "Unggah foto KTP, Kartu Keluarga, dan Pas Foto.",
-    },
-    {
-      step: "03",
-      title: "Dapatkan Kode",
-      description: "Simpan kode pendaftaran untuk memantau status.",
     },
     {
       step: "04",
@@ -101,7 +105,7 @@ export default function LandingPage() {
               tanpa perlu antri di kantor cabang.
             </p>
             <div className="flex flex-wrap gap-4 animate-slide-up delay-300">
-              <Link to="/register">
+              <Link to={user ? "/register" : "/login"}>
                 <Button
                   size="lg"
                   className="bg-white text-primary-700 hover:bg-neutral-100 shadow-lg hover:shadow-xl"
@@ -231,7 +235,7 @@ export default function LandingPage() {
               Lindungi diri dan keluarga Anda dengan jaminan kesehatan nasional.
               Daftar sekarang, proses cepat dan mudah.
             </p>
-            <Link to="/register">
+            <Link to={user ? "/register" : "/login"}>
               <Button
                 size="lg"
                 className="bg-white text-primary-700 hover:bg-neutral-100 shadow-lg"

@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,8 +26,11 @@ import {
   Camera,
   CreditCard,
   Users,
+  UserPlus,
+  Home,
+  Check,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const INITIAL_FORM = {
   family_card_number: "",
@@ -59,6 +63,16 @@ function generateRegistrationCode() {
 
 export default function Register() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
+
+  // Registration type: null = choosing, "new" = kepala keluarga / individu baru, "add" = tambah anggota
+  const [regType, setRegType] = useState(null);
+  const [existingApplicants, setExistingApplicants] = useState([]);
+  const [loadingExisting, setLoadingExisting] = useState(false);
+  const [allowEditKK, setAllowEditKK] = useState(false);
+  const [prefilledKkUrl, setPrefilledKkUrl] = useState(null);
+
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(INITIAL_FORM);
   const [files, setFiles] = useState({ ktp: null, kk: null, photo: null });
@@ -66,6 +80,119 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
+  // Check for prefill data passed from Success page
+  const prefillFamilyCard = location.state?.prefillFamilyCard;
+  const incomingMode = location.state?.mode; // "add_member"
+
+  // On mount: load existing applicants for this user (by user_id OR email)
+  useEffect(() => {
+    if (!user) return;
+    const fetchExisting = async () => {
+      setLoadingExisting(true);
+      try {
+        let query = supabase.from("applicants").select("*");
+        if (user.id && user.email) {
+          query = query.or(`user_id.eq.${user.id},email.eq.${user.email}`);
+        } else if (user.id) {
+          query = query.eq("user_id", user.id);
+        } else if (user.email) {
+          query = query.eq("email", user.email);
+        }
+
+        const { data, error } = await query.order("created_at", { ascending: false });
+
+        if (!error && data && data.length > 0) {
+          setExistingApplicants(data);
+
+          // Hubungkan record lama yang user_id nya masih null ke user.id sekarang
+          const unlinked = data.filter((item) => !item.user_id && item.email === user.email);
+          if (unlinked.length > 0) {
+            supabase
+              .from("applicants")
+              .update({ user_id: user.id })
+              .in("id", unlinked.map((u) => u.id))
+              .then(() => {});
+          }
+        }
+      } catch (err) {
+        console.error("Gagal memuat data pendaftar keluarga:", err);
+      } finally {
+        setLoadingExisting(false);
+      }
+    };
+    fetchExisting();
+  }, [user]);
+
+  // Jika dialihkan dari halaman success dengan mode "add_member"
+  useEffect(() => {
+    if (incomingMode === "add_member") {
+      setRegType("add");
+      const targetKK =
+        prefillFamilyCard ||
+        existingApplicants.find((a) => a.family_card_number?.length === 16)?.family_card_number ||
+        "";
+      const prev = existingApplicants[0];
+
+      if (targetKK) {
+        setForm((prevForm) => ({
+          ...prevForm,
+          family_card_number: targetKK,
+          email: user?.email || prevForm.email,
+          address: prev?.address || prevForm.address,
+          rt: prev?.rt || prevForm.rt,
+          rw: prev?.rw || prevForm.rw,
+          postal_code: prev?.postal_code || prevForm.postal_code,
+          district: prev?.district || prevForm.district,
+          village: prev?.village || prevForm.village,
+          facility_name: prev?.facility_name || prevForm.facility_name,
+        }));
+      }
+
+      if (prev?.kk_url) {
+        setPrefilledKkUrl(prev.kk_url);
+        setPreviews((p) => ({ ...p, kk: prev.kk_url }));
+      }
+    }
+  }, [incomingMode, prefillFamilyCard, existingApplicants, user]);
+
+  // Auto-sync KK jika user sudah di form mode "add" dan existingApplicants selesai dimuat
+  useEffect(() => {
+    if (
+      regType === "add" &&
+      (!form.family_card_number || form.family_card_number.length !== 16) &&
+      existingApplicants.length > 0
+    ) {
+      const prev =
+        existingApplicants.find((a) => a.family_card_number?.length === 16) ||
+        existingApplicants[0];
+
+      if (prev?.family_card_number) {
+        setForm((prevForm) => ({
+          ...prevForm,
+          family_card_number: prev.family_card_number,
+          email: prevForm.email || user?.email || "",
+          address: prevForm.address || prev.address || "",
+          rt: prevForm.rt || prev.rt || "",
+          rw: prevForm.rw || prev.rw || "",
+          postal_code: prevForm.postal_code || prev.postal_code || "",
+          district: prevForm.district || prev.district || "",
+          village: prevForm.village || prev.village || "",
+          facility_name: prevForm.facility_name || prev.facility_name || "",
+        }));
+
+        if (prev.kk_url && !previews.kk) {
+          setPrefilledKkUrl(prev.kk_url);
+          setPreviews((p) => ({ ...p, kk: prev.kk_url }));
+        }
+
+        if (errors.family_card_number) {
+          setErrors((e) => ({ ...e, family_card_number: null }));
+        }
+      }
+    }
+  }, [regType, existingApplicants, form.family_card_number, errors.family_card_number, previews.kk, user]);
+
+  /* ── Handlers ── */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -87,6 +214,10 @@ export default function Register() {
       setPreviews((prev) => ({ ...prev, [key]: ev.target.result }));
     };
     reader.readAsDataURL(file);
+
+    if (errors[key]) {
+      setErrors((prev) => ({ ...prev, [key]: null }));
+    }
   };
 
   const validateStep1 = () => {
@@ -119,7 +250,7 @@ export default function Register() {
   const validateStep3 = () => {
     const errs = {};
     if (!files.ktp) errs.ktp = "Foto KTP wajib diunggah";
-    if (!files.kk) errs.kk = "Foto KK wajib diunggah";
+    if (!files.kk && !prefilledKkUrl) errs.kk = "Foto KK wajib diunggah";
     if (!files.photo) errs.photo = "Pas Foto wajib diunggah";
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -154,11 +285,17 @@ export default function Register() {
     if (!validateStep3()) return;
     setLoading(true);
     try {
-      /* Upload 3 files */
+      // Upload dokumen yang diunggah
+      const ktpPromise = uploadFile(files.ktp, "ktp");
+      const kkPromise = files.kk
+        ? uploadFile(files.kk, "kk")
+        : Promise.resolve(prefilledKkUrl || "");
+      const photoPromise = uploadFile(files.photo, "photo");
+
       const [ktpUrl, kkUrl, photoUrl] = await Promise.all([
-        uploadFile(files.ktp, "ktp"),
-        uploadFile(files.kk, "kk"),
-        uploadFile(files.photo, "photo"),
+        ktpPromise,
+        kkPromise,
+        photoPromise,
       ]);
 
       const registrationCode = generateRegistrationCode();
@@ -174,7 +311,7 @@ export default function Register() {
         gender: parseInt(form.gender),
         marital_status: parseInt(form.marital_status),
         phone_number: form.phone_number,
-        email: form.email,
+        email: form.email || user?.email || "",
         address: form.address,
         rt: form.rt,
         rw: form.rw,
@@ -186,6 +323,7 @@ export default function Register() {
         kk_url: kkUrl,
         photo_url: photoUrl,
         status: "pending",
+        user_id: user?.id ?? null,
       });
 
       if (error) throw error;
@@ -195,6 +333,7 @@ export default function Register() {
         state: {
           registrationCode,
           fullName: form.full_name,
+          familyCardNumber: form.family_card_number,
         },
       });
     } catch (err) {
@@ -205,20 +344,69 @@ export default function Register() {
     }
   };
 
+  /* ── Pilih Tipe Pendaftaran ── */
+  const selectType = (type) => {
+    setRegType(type);
+    setStep(1);
+    setErrors({});
+    setAllowEditKK(false);
 
+    if (type === "add") {
+      const prev =
+        existingApplicants.find((a) => a.family_card_number?.length === 16) ||
+        existingApplicants[0];
+      const targetKK =
+        prefillFamilyCard ||
+        prev?.family_card_number ||
+        "";
 
+      setForm({
+        ...INITIAL_FORM,
+        family_card_number: targetKK,
+        email: user?.email || "",
+        address: prev?.address || "",
+        rt: prev?.rt || "",
+        rw: prev?.rw || "",
+        postal_code: prev?.postal_code || "",
+        district: prev?.district || "",
+        village: prev?.village || "",
+        facility_name: prev?.facility_name || "",
+      });
+
+      if (prev?.kk_url) {
+        setPrefilledKkUrl(prev.kk_url);
+        setPreviews({ ktp: null, kk: prev.kk_url, photo: null });
+      } else {
+        setPrefilledKkUrl(null);
+        setPreviews({ ktp: null, kk: null, photo: null });
+      }
+    } else {
+      setForm({
+        ...INITIAL_FORM,
+        email: user?.email || "",
+      });
+      setPrefilledKkUrl(null);
+      setPreviews({ ktp: null, kk: null, photo: null });
+    }
+
+    setFiles({ ktp: null, kk: null, photo: null });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  /* ── Step indicators ── */
   const stepIndicators = [
     { num: 1, label: "Data Diri", icon: User },
     { num: 2, label: "Alamat", icon: MapPin },
     { num: 3, label: "Dokumen", icon: Upload },
   ];
 
-  const FileUploadBox = ({ id, label, icon: Icon, fileKey, accept }) => (
+  /* ── File upload box ── */
+  const FileUploadBox = ({ id, label, icon: Icon, fileKey, accept, note }) => (
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>
       <label
         htmlFor={id}
-        className={`flex flex-col items-center justify-center w-full h-44 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 ${
+        className={`flex flex-col items-center justify-center w-full h-44 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden ${
           previews[fileKey]
             ? "border-primary-300 bg-primary-50/50"
             : errors[fileKey]
@@ -227,16 +415,24 @@ export default function Register() {
         }`}
       >
         {previews[fileKey] ? (
-          <img
-            src={previews[fileKey]}
-            alt={label}
-            className="h-36 w-auto object-contain rounded-lg"
-          />
+          <div className="relative w-full h-full flex flex-col items-center justify-center p-2">
+            <img
+              src={previews[fileKey]}
+              alt={label}
+              className="h-32 w-auto object-contain rounded-lg"
+            />
+            <span className="text-[11px] text-primary-700 font-medium mt-1 bg-white/90 px-2 py-0.5 rounded shadow-sm">
+              {fileKey === "kk" && prefilledKkUrl && !files.kk
+                ? "✓ Foto KK dari keluarga sebelumnya (klik untuk ganti)"
+                : "Klik untuk mengganti"}
+            </span>
+          </div>
         ) : (
-          <div className="flex flex-col items-center gap-2 text-neutral-400">
+          <div className="flex flex-col items-center gap-2 text-neutral-400 p-4 text-center">
             <Icon className="w-8 h-8" />
             <span className="text-sm font-medium">Klik untuk unggah</span>
             <span className="text-xs">JPG, PNG, PDF (maks. 5MB)</span>
+            {note && <span className="text-[11px] text-primary-600">{note}</span>}
           </div>
         )}
         <input
@@ -253,15 +449,158 @@ export default function Register() {
     </div>
   );
 
+  /* ════════════════════════════════════════════════════
+     TAMPILAN PILIH JENIS PENDAFTARAN
+  ════════════════════════════════════════════════════ */
+  if (!regType) {
+    const hasExisting = existingApplicants.length > 0;
+    const primaryApplicant =
+      existingApplicants.find((a) => a.family_card_number?.length === 16) ||
+      existingApplicants[0];
+
+    return (
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10 sm:py-16 animate-fade-in">
+        <div className="text-center mb-10">
+          <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 mb-2">
+            Pendaftaran BPJS Kesehatan
+          </h1>
+          <p className="text-neutral-500">
+            Pilih jenis pendaftaran yang sesuai dengan kebutuhan Anda.
+          </p>
+        </div>
+
+        {/* Loading status */}
+        {loadingExisting && (
+          <div className="flex items-center justify-center gap-2 mb-8 text-neutral-500 text-sm">
+            <Loader2 className="w-4 h-4 animate-spin text-primary-500" />
+            Memeriksa data keluarga terdaftar...
+          </div>
+        )}
+
+        {/* Anggota keluarga yang sudah terdaftar */}
+        {!loadingExisting && hasExisting && (
+          <div className="mb-8 p-5 bg-primary-50/70 border border-primary-200 rounded-2xl">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-bold text-primary-900 flex items-center gap-2">
+                <Users className="w-4 h-4 text-primary-600" />
+                Kartu Keluarga Terdaftar:{" "}
+                <span className="font-mono text-primary-700 bg-white px-2 py-0.5 rounded border border-primary-200">
+                  {primaryApplicant?.family_card_number}
+                </span>
+              </p>
+              <span className="text-xs font-medium text-primary-700 bg-primary-100 px-2 py-0.5 rounded-full">
+                {existingApplicants.length} Anggota
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              {existingApplicants.map((a) => (
+                <div
+                  key={a.id}
+                  className="flex items-center justify-between bg-white rounded-xl px-3.5 py-2.5 border border-primary-100 shadow-xs"
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-neutral-800">{a.full_name}</p>
+                    <p className="text-xs text-neutral-500 font-mono">
+                      NIK: {a.nik} · Faskes: {a.facility_name || "-"}
+                    </p>
+                  </div>
+                  <span
+                    className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${
+                      a.status === "approved"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : a.status === "rejected"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-amber-100 text-amber-700"
+                    }`}
+                  >
+                    {a.status === "approved"
+                      ? "Disetujui"
+                      : a.status === "rejected"
+                        ? "Ditolak"
+                        : "Menunggu"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Kartu Pilihan Tipe */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <button
+            type="button"
+            onClick={() => selectType("new")}
+            className="group text-left p-6 border-2 border-neutral-200 rounded-2xl hover:border-primary-400 hover:bg-primary-50/40 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400"
+          >
+            <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center mb-4 group-hover:bg-primary-200 transition-colors">
+              <Home className="w-6 h-6 text-primary-600" />
+            </div>
+            <h3 className="font-bold text-neutral-900 mb-1">
+              Kepala Keluarga / KK Baru
+            </h3>
+            <p className="text-sm text-neutral-500 leading-relaxed">
+              Pendaftaran dengan nomor Kartu Keluarga baru. Isi data lengkap dari awal.
+            </p>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => selectType("add")}
+            className="group text-left p-6 border-2 border-emerald-300 bg-emerald-50/30 rounded-2xl hover:border-emerald-500 hover:bg-emerald-50/70 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 relative"
+          >
+            {hasExisting && (
+              <span className="absolute top-4 right-4 bg-emerald-600 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full">
+                Auto-fill No KK
+              </span>
+            )}
+            <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-4 group-hover:bg-emerald-200 transition-colors">
+              <UserPlus className="w-6 h-6 text-emerald-600" />
+            </div>
+            <h3 className="font-bold text-neutral-900 mb-1">
+              Tambah Anggota Keluarga
+            </h3>
+            <p className="text-sm text-neutral-600 leading-relaxed">
+              {hasExisting
+                ? `Daftarkan anggota keluarga lain dalam KK (${primaryApplicant?.family_card_number}). Nomor KK & alamat otomatis terisi.`
+                : "Daftarkan anggota keluarga lain (suami/istri/anak) dalam Kartu Keluarga yang sama."}
+            </p>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  /* ════════════════════════════════════════════════════
+     FORMULIR PENDAFTARAN MULTI-STEP
+  ════════════════════════════════════════════════════ */
+  const isKkFilled16 = form.family_card_number && form.family_card_number.length === 16;
+  const isKkLocked = regType === "add" && isKkFilled16 && !allowEditKK;
+
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <button
+            type="button"
+            onClick={() => {
+              setRegType(null);
+              setStep(1);
+            }}
+            className="text-sm text-primary-600 hover:underline flex items-center gap-1 font-medium"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Ganti Jenis Pendaftaran
+          </button>
+        </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 mb-2">
-          Formulir Pendaftaran BPJS
+          {regType === "add" ? "Tambah Anggota Keluarga" : "Formulir Pendaftaran BPJS"}
         </h1>
         <p className="text-neutral-500">
-          Lengkapi data berikut untuk mendaftar sebagai peserta BPJS Kesehatan.
+          {regType === "add"
+            ? "Daftarkan anggota keluarga baru dalam Kartu Keluarga yang sama."
+            : "Lengkapi data berikut untuk mendaftar sebagai peserta BPJS Kesehatan."}
         </p>
       </div>
 
@@ -320,6 +659,7 @@ export default function Register() {
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {/* NIK */}
               <div className="space-y-2">
                 <Label htmlFor="nik">NIK (16 Digit) *</Label>
                 <Input
@@ -328,28 +668,63 @@ export default function Register() {
                   placeholder="3201234567890001"
                   maxLength={16}
                   value={form.nik}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "");
+                    setForm((p) => ({ ...p, nik: val }));
+                    if (errors.nik) setErrors((p) => ({ ...p, nik: null }));
+                  }}
                   className={errors.nik ? "border-red-400" : ""}
                 />
                 {errors.nik && (
                   <p className="text-xs text-red-500">{errors.nik}</p>
                 )}
               </div>
+
+              {/* No KK */}
               <div className="space-y-2">
-                <Label htmlFor="family_card_number">
-                  No. Kartu Keluarga (16 Digit) *
-                </Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="family_card_number">
+                    No. Kartu Keluarga (16 Digit) *
+                  </Label>
+                  {regType === "add" && isKkFilled16 && (
+                    <button
+                      type="button"
+                      onClick={() => setAllowEditKK(!allowEditKK)}
+                      className="text-xs text-primary-600 hover:text-primary-800 font-medium cursor-pointer"
+                    >
+                      {allowEditKK ? "Kunci No. KK" : "Ubah No. KK"}
+                    </button>
+                  )}
+                </div>
                 <Input
                   id="family_card_number"
                   name="family_card_number"
                   placeholder="3201234567890001"
                   maxLength={16}
                   value={form.family_card_number}
-                  onChange={handleChange}
-                  className={
-                    errors.family_card_number ? "border-red-400" : ""
-                  }
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "");
+                    setForm((p) => ({ ...p, family_card_number: val }));
+                    if (errors.family_card_number) {
+                      setErrors((p) => ({ ...p, family_card_number: null }));
+                    }
+                  }}
+                  className={`${errors.family_card_number ? "border-red-400" : ""} ${
+                    isKkLocked ? "bg-emerald-50/50 text-emerald-900 border-emerald-300 font-medium" : ""
+                  }`}
+                  readOnly={isKkLocked}
                 />
+                {isKkLocked && (
+                  <p className="text-xs text-emerald-600 flex items-center gap-1 font-medium">
+                    <Check className="w-3.5 h-3.5 shrink-0" />
+                    Nomor KK diisi otomatis dari data keluarga sebelumnya
+                  </p>
+                )}
+                {regType === "add" && allowEditKK && (
+                  <p className="text-xs text-amber-600">
+                    Mode ubah aktif: masukkan 16 digit No. KK jika ingin mengganti.
+                  </p>
+                )}
                 {errors.family_card_number && (
                   <p className="text-xs text-red-500">
                     {errors.family_card_number}
@@ -358,6 +733,7 @@ export default function Register() {
               </div>
             </div>
 
+            {/* Nama Lengkap */}
             <div className="space-y-2">
               <Label htmlFor="full_name">Nama Lengkap *</Label>
               <Input
@@ -373,6 +749,7 @@ export default function Register() {
               )}
             </div>
 
+            {/* PISAT */}
             <div className="space-y-2">
               <Label htmlFor="pisat_code">Status Kepesertaan (PISAT) *</Label>
               <Select
@@ -383,7 +760,7 @@ export default function Register() {
                 className={errors.pisat_code ? "border-red-400" : ""}
               >
                 <option value="">Pilih Status</option>
-                <option value="1">1 - Peserta</option>
+                {regType !== "add" && <option value="1">1 - Peserta (Kepala Keluarga)</option>}
                 <option value="2">2 - Suami</option>
                 <option value="3">3 - Istri</option>
                 <option value="4">4 - Anak</option>
@@ -393,6 +770,7 @@ export default function Register() {
               )}
             </div>
 
+            {/* Tempat & Tgl Lahir */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-2">
                 <Label htmlFor="birth_place">Tempat Lahir *</Label>
@@ -424,6 +802,7 @@ export default function Register() {
               </div>
             </div>
 
+            {/* Jenis Kelamin & Status Kawin */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-2">
                 <Label htmlFor="gender">Jenis Kelamin *</Label>
@@ -465,6 +844,7 @@ export default function Register() {
               </div>
             </div>
 
+            {/* No Telepon & Email */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-2">
                 <Label htmlFor="phone_number">No. Telepon</Label>
@@ -508,9 +888,11 @@ export default function Register() {
                 <MapPin className="w-5 h-5 text-amber-500" />
               </div>
               <div>
-                <CardTitle>Alamat & Faskes</CardTitle>
+                <CardTitle>Alamat &amp; Faskes</CardTitle>
                 <CardDescription>
-                  Masukkan alamat tempat tinggal dan pilihan fasilitas kesehatan
+                  {regType === "add"
+                    ? "Alamat dan Faskes telah diisi sesuai data keluarga, silakan sesuaikan jika diperlukan."
+                    : "Masukkan alamat tempat tinggal dan pilihan fasilitas kesehatan."}
                 </CardDescription>
               </div>
             </div>
@@ -655,6 +1037,7 @@ export default function Register() {
                 icon={Users}
                 fileKey="kk"
                 accept="image/*,.pdf"
+                note={prefilledKkUrl ? "✓ Telah terisi dari foto KK keluarga" : null}
               />
               <FileUploadBox
                 id="upload-photo"
@@ -696,8 +1079,6 @@ export default function Register() {
           </CardContent>
         </Card>
       )}
-
-
     </div>
   );
 }

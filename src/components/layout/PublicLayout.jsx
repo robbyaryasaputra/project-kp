@@ -1,14 +1,25 @@
-import { Link, Outlet, useLocation } from "react-router-dom";
-import { Shield, FileText, Search, Home } from "lucide-react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Shield, FileText, Search, Home, LogIn, LogOut, UserCircle } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function PublicLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, loading, signOut } = useAuth();
 
   const navLinks = [
     { to: "/", label: "Beranda", icon: Home },
     { to: "/register", label: "Daftar BPJS", icon: FileText },
     { to: "/cek-status", label: "Cek Status", icon: Search },
   ];
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Berhasil keluar");
+    navigate("/");
+  };
 
   return (
     <div className="min-h-screen bg-neutral-50 flex flex-col">
@@ -31,27 +42,61 @@ export default function PublicLayout() {
               </div>
             </Link>
 
-            {/* Navigation */}
-            <nav className="flex items-center gap-1">
-              {navLinks.map((link) => {
-                const Icon = link.icon;
-                const isActive = location.pathname === link.to;
-                return (
-                  <Link
-                    key={link.to}
-                    to={link.to}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 no-underline ${
-                      isActive
-                        ? "bg-primary-50 text-primary-700"
-                        : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span className="hidden sm:inline">{link.label}</span>
-                  </Link>
-                );
-              })}
-            </nav>
+            {/* Navigation + Auth */}
+            <div className="flex items-center gap-1">
+              <nav className="flex items-center gap-1">
+                {navLinks.map((link) => {
+                  const Icon = link.icon;
+                  const isActive = location.pathname === link.to;
+                  return (
+                    <Link
+                      key={link.to}
+                      to={link.to}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 no-underline ${
+                        isActive
+                          ? "bg-primary-50 text-primary-700"
+                          : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span className="hidden sm:inline">{link.label}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+
+              {/* Auth area */}
+              {!loading && (
+                <div className="ml-2 flex items-center gap-2">
+                  {user ? (
+                    <>
+                      <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-50 text-primary-700 text-sm font-medium">
+                        <UserCircle className="w-4 h-4" />
+                        <span className="max-w-[120px] truncate">
+                          {user.user_metadata?.full_name || user.email}
+                        </span>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleSignOut}
+                        className="flex items-center gap-1.5 text-neutral-600"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Keluar</span>
+                      </Button>
+                    </>
+                  ) : (
+                    <Link to="/login" className="no-underline">
+                      <Button size="sm" className="flex items-center gap-1.5">
+                        <LogIn className="w-3.5 h-3.5" />
+                        <span>Masuk</span>
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>

@@ -38,6 +38,7 @@ export default function VerifyDetail() {
   const [loading, setLoading] = useState(true);
   const [actionMode, setActionMode] = useState(null); // 'approve' | 'reject'
   const [cardNumber, setCardNumber] = useState("");
+  const [statusNote, setStatusNote] = useState("Disetujui");
   const [rejectionReason, setRejectionReason] = useState("");
   const [processing, setProcessing] = useState(false);
 
@@ -56,6 +57,9 @@ export default function VerifyDetail() {
 
       if (error) throw error;
       setApplicant(data);
+      if (data?.notes) {
+        setStatusNote(data.notes);
+      }
     } catch (err) {
       console.error(err);
       toast.error("Gagal memuat data pendaftar.");
@@ -70,6 +74,7 @@ export default function VerifyDetail() {
       toast.error("Nomor Kartu BPJS wajib diisi.");
       return;
     }
+    const finalNote = statusNote.trim() || "Disetujui";
     setProcessing(true);
     try {
       const { error } = await supabase
@@ -77,6 +82,7 @@ export default function VerifyDetail() {
         .update({
           status: "approved",
           card_number: cardNumber.trim(),
+          notes: finalNote,
         })
         .eq("id", applicant.id);
 
@@ -367,21 +373,54 @@ export default function VerifyDetail() {
                   <CheckCircle className="w-4 h-4" />
                   Setujui Pendaftaran — {applicant.full_name}
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-emerald-800">
-                    Nomor Kartu BPJS *
-                  </Label>
-                  <Input
-                    placeholder="Masukkan nomor kartu BPJS yang diterbitkan..."
-                    value={cardNumber}
-                    onChange={(e) => setCardNumber(e.target.value)}
-                    className="border-emerald-300 focus:border-emerald-500"
-                  />
-                  <p className="text-xs text-emerald-600">
-                    Masukkan nomor kartu BPJS Kesehatan yang diterbitkan untuk peserta ini.
-                  </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-emerald-800">
+                      Nomor Kartu BPJS *
+                    </Label>
+                    <Input
+                      placeholder="Masukkan nomor kartu BPJS yang diterbitkan..."
+                      value={cardNumber}
+                      onChange={(e) => setCardNumber(e.target.value)}
+                      className="border-emerald-300 focus:border-emerald-500 bg-white"
+                    />
+                    <p className="text-xs text-emerald-600">
+                      Masukkan nomor kartu BPJS Kesehatan yang diterbitkan untuk peserta ini.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-emerald-800">
+                      Status / Keterangan *
+                    </Label>
+                    <Input
+                      placeholder="Contoh: Disetujui, Aktif, PBI APBD, dll..."
+                      value={statusNote}
+                      onChange={(e) => setStatusNote(e.target.value)}
+                      className="border-emerald-300 focus:border-emerald-500 bg-white"
+                    />
+                    <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                      <span className="text-[11px] text-emerald-700">Pilihan cepat:</span>
+                      {["Disetujui", "Aktif", "PBI APBD", "Non-PBI"].map((opt) => (
+                        <button
+                          key={opt}
+                          type="button"
+                          onClick={() => setStatusNote(opt)}
+                          className={`text-[11px] px-2 py-0.5 rounded border transition-colors ${
+                            statusNote === opt
+                              ? "bg-emerald-600 text-white border-emerald-600 font-medium"
+                              : "bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-100"
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <div className="flex gap-2 justify-end">
+                <p className="text-xs text-emerald-600">
+                  Status/keterangan ini akan tersimpan dan otomatis masuk ke file Excel rekap pada kolom Keterangan.
+                </p>
+                <div className="flex gap-2 justify-end pt-2 border-t border-emerald-200">
                   <Button
                     variant="ghost"
                     onClick={() => setActionMode(null)}
@@ -460,6 +499,12 @@ export default function VerifyDetail() {
               <p className="font-semibold text-emerald-700">Pendaftaran Disetujui</p>
               <p className="text-sm text-emerald-600">
                 Nomor Kartu BPJS: <span className="font-mono font-bold">{applicant.card_number || "-"}</span>
+              </p>
+              <p className="text-sm text-emerald-600 mt-0.5">
+                Status / Keterangan:{" "}
+                <span className="font-semibold text-emerald-800">
+                  {applicant.notes || "Disetujui"}
+                </span>
               </p>
             </div>
           </CardContent>

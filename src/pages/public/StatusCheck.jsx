@@ -65,10 +65,19 @@ export default function StatusCheck() {
     }
   };
 
-  const handleDownloadPDF = () => {
-    if (result) {
-      generateApprovalPDF(result);
-      toast.success("PDF berhasil diunduh!");
+  const handleDownloadPDF = async () => {
+    if (!result) return;
+    try {
+      // Fetch total applicants count for "Usulan" field
+      const { count } = await supabase
+        .from("applicants")
+        .select("*", { count: "exact", head: true });
+      generateApprovalPDF(result, count ?? 1);
+      toast.success("Bukti pendaftaran berhasil diunduh!");
+    } catch (err) {
+      console.error(err);
+      generateApprovalPDF(result, 1);
+      toast.success("Bukti pendaftaran berhasil diunduh!");
     }
   };
 
@@ -104,7 +113,7 @@ export default function StatusCheck() {
 
   const getGenderLabel = (g) => (g === 1 ? "Laki-laki" : "Perempuan");
   const getMaritalLabel = (m) =>
-    ({ 0: "Tidak Diketahui", 1: "Belum Kawin", 2: "Kawin", 3: "Cerai" }[m] ||
+  ({ 0: "Tidak Diketahui", 1: "Belum Kawin", 2: "Kawin", 3: "Cerai" }[m] ||
     "-");
   const getPisatLabel = (p) =>
     ({ 1: "Peserta", 2: "Suami", 3: "Istri", 4: "Anak" }[p] || "-");
@@ -230,17 +239,15 @@ export default function StatusCheck() {
                           </div>
                         )}
 
-                      {/* Download PDF button (approved only) */}
-                      {result.status === "approved" && (
-                        <Button
-                          className="mt-4"
-                          variant="success"
-                          onClick={handleDownloadPDF}
-                        >
-                          <Download className="w-4 h-4" />
-                          Download Bukti PDF
-                        </Button>
-                      )}
+                      {/* Download Bukti Pendaftaran — available for all statuses */}
+                      <Button
+                        className="mt-4"
+                        variant={result.status === "approved" ? "success" : "outline"}
+                        onClick={handleDownloadPDF}
+                      >
+                        <Download className="w-4 h-4" />
+                        Download Bukti Pendaftaran
+                      </Button>
                     </div>
                   </div>
                 </CardContent>

@@ -6,11 +6,12 @@ import * as XLSX from "xlsx";
  */
 export function exportToExcel(data) {
   const rows = data.map((item) => ({
+    "NO KK": item.family_card_number ? String(item.family_card_number) : "",
     "JUMLAH DIGIT KK": item.family_card_number
-      ? item.family_card_number.length
+      ? String(item.family_card_number).length
       : 0,
-    NIK: item.nik,
-    "JUMLAH DIGIT NIK": item.nik ? item.nik.length : 0,
+    NIK: item.nik ? String(item.nik) : "",
+    "JUMLAH DIGIT NIK": item.nik ? String(item.nik).length : 0,
     "Nama Lengkap": item.full_name,
     PISAT: item.pisat_code,
     "Tempat Lahir": item.birth_place,
@@ -24,7 +25,12 @@ export function exportToExcel(data) {
     "Nama Kecamatan": item.district,
     "Nama Desa": item.village,
     "Nama Faskes Tk.I": item.facility_name,
-    Keterangan: item.notes || "",
+    Keterangan:
+      item.notes && item.notes.trim()
+        ? item.notes.trim()
+        : item.status === "approved"
+          ? "Disetujui"
+          : item.status || "",
   }));
 
   const worksheet = XLSX.utils.json_to_sheet(rows);

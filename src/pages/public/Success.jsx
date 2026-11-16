@@ -16,12 +16,13 @@ import {
   ArrowRight,
   Shield,
   Sparkles,
+  Users,
 } from "lucide-react";
 
 export default function Success() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { registrationCode, fullName } = location.state || {};
+  const { registrationCode, fullName, familyCardNumber } = location.state || {};
 
   /* If user navigated directly without state, redirect */
   if (!registrationCode) {
@@ -152,12 +153,16 @@ export default function Success() {
             <ArrowRight className="w-4 h-4" />
           </Button>
         </Link>
-        <Link to="/register" className="flex-1">
-          <Button variant="outline" className="w-full" size="lg">
-            <FileText className="w-4 h-4" />
-            Daftar Lagi
-          </Button>
-        </Link>
+          <Link
+            to="/register"
+            state={{ prefillFamilyCard: familyCardNumber, mode: "add_member" }}
+            className="flex-1"
+          >
+            <Button variant="outline" className="w-full" size="lg">
+              <Users className="w-4 h-4" />
+              Tambah Anggota Keluarga
+            </Button>
+          </Link>
       </div>
     </div>
   );
