@@ -23,7 +23,6 @@ import {
   CheckCircle2,
   ArrowRight,
   ArrowLeft,
-  Camera,
   CreditCard,
   Users,
   UserPlus,
@@ -69,14 +68,14 @@ export default function Register() {
   // Registration type: null = choosing, "new" = kepala keluarga / individu baru, "add" = tambah anggota
   const [regType, setRegType] = useState(null);
   const [existingApplicants, setExistingApplicants] = useState([]);
-  const [loadingExisting, setLoadingExisting] = useState(false);
+  const [loadingExisting, setLoadingExisting] = useState(Boolean(user));
   const [allowEditKK, setAllowEditKK] = useState(false);
   const [prefilledKkUrl, setPrefilledKkUrl] = useState(null);
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(INITIAL_FORM);
-  const [files, setFiles] = useState({ ktp: null, kk: null, photo: null });
-  const [previews, setPreviews] = useState({ ktp: null, kk: null, photo: null });
+  const [files, setFiles] = useState({ ktp: null, kk: null });
+  const [previews, setPreviews] = useState({ ktp: null, kk: null });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -111,7 +110,7 @@ export default function Register() {
               .from("applicants")
               .update({ user_id: user.id })
               .in("id", unlinked.map((u) => u.id))
-              .then(() => {});
+              .then(() => { });
           }
         }
       } catch (err) {
@@ -249,9 +248,9 @@ export default function Register() {
 
   const validateStep3 = () => {
     const errs = {};
-    if (!files.ktp) errs.ktp = "Foto KTP wajib diunggah";
-    if (!files.kk && !prefilledKkUrl) errs.kk = "Foto KK wajib diunggah";
-    if (!files.photo) errs.photo = "Pas Foto wajib diunggah";
+    if (!files.kk && !prefilledKkUrl) {
+      errs.kk = "Foto Kartu Keluarga (KK) wajib diunggah";
+    }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -286,16 +285,16 @@ export default function Register() {
     setLoading(true);
     try {
       // Upload dokumen yang diunggah
-      const ktpPromise = uploadFile(files.ktp, "ktp");
+      const ktpPromise = files.ktp
+        ? uploadFile(files.ktp, "ktp")
+        : Promise.resolve(null);
       const kkPromise = files.kk
         ? uploadFile(files.kk, "kk")
         : Promise.resolve(prefilledKkUrl || "");
-      const photoPromise = uploadFile(files.photo, "photo");
 
-      const [ktpUrl, kkUrl, photoUrl] = await Promise.all([
+      const [ktpUrl, kkUrl] = await Promise.all([
         ktpPromise,
         kkPromise,
-        photoPromise,
       ]);
 
       const registrationCode = generateRegistrationCode();
@@ -321,7 +320,7 @@ export default function Register() {
         facility_name: form.facility_name,
         ktp_url: ktpUrl,
         kk_url: kkUrl,
-        photo_url: photoUrl,
+        photo_url: null,
         status: "pending",
         user_id: user?.id ?? null,
       });
@@ -375,10 +374,10 @@ export default function Register() {
 
       if (prev?.kk_url) {
         setPrefilledKkUrl(prev.kk_url);
-        setPreviews({ ktp: null, kk: prev.kk_url, photo: null });
+        setPreviews({ ktp: null, kk: prev.kk_url });
       } else {
         setPrefilledKkUrl(null);
-        setPreviews({ ktp: null, kk: null, photo: null });
+        setPreviews({ ktp: null, kk: null });
       }
     } else {
       setForm({
@@ -386,10 +385,10 @@ export default function Register() {
         email: user?.email || "",
       });
       setPrefilledKkUrl(null);
-      setPreviews({ ktp: null, kk: null, photo: null });
+      setPreviews({ ktp: null, kk: null });
     }
 
-    setFiles({ ktp: null, kk: null, photo: null });
+    setFiles({ ktp: null, kk: null });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -406,13 +405,12 @@ export default function Register() {
       <Label htmlFor={id}>{label}</Label>
       <label
         htmlFor={id}
-        className={`flex flex-col items-center justify-center w-full h-44 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden ${
-          previews[fileKey]
-            ? "border-primary-300 bg-primary-50/50"
-            : errors[fileKey]
-              ? "border-red-300 bg-red-50/50"
-              : "border-neutral-300 bg-neutral-50 hover:bg-neutral-100 hover:border-primary-400"
-        }`}
+        className={`flex flex-col items-center justify-center w-full h-44 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden ${previews[fileKey]
+          ? "border-primary-300 bg-primary-50/50"
+          : errors[fileKey]
+            ? "border-red-300 bg-red-50/50"
+            : "border-neutral-300 bg-neutral-50 hover:bg-neutral-100 hover:border-primary-400"
+          }`}
       >
         {previews[fileKey] ? (
           <div className="relative w-full h-full flex flex-col items-center justify-center p-2">
@@ -459,7 +457,7 @@ export default function Register() {
       existingApplicants[0];
 
     return (
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10 sm:py-16 animate-fade-in">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
         <div className="text-center mb-10">
           <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 mb-2">
             Pendaftaran BPJS Kesehatan
@@ -469,26 +467,23 @@ export default function Register() {
           </p>
         </div>
 
-        {/* Loading status */}
-        {loadingExisting && (
-          <div className="flex items-center justify-center gap-2 mb-8 text-neutral-500 text-sm">
-            <Loader2 className="w-4 h-4 animate-spin text-primary-500" />
-            Memeriksa data keluarga terdaftar...
+        {/* Status Data Keluarga Terdaftar */}
+        {loadingExisting ? (
+          <div className="mb-8 p-4 rounded-2xl bg-neutral-100/60 border border-neutral-200/60 flex items-center justify-center gap-2.5 text-neutral-500 text-xs sm:text-sm">
+            <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
+            <span>Memeriksa data keluarga terdaftar...</span>
           </div>
-        )}
-
-        {/* Anggota keluarga yang sudah terdaftar */}
-        {!loadingExisting && hasExisting && (
-          <div className="mb-8 p-5 bg-primary-50/70 border border-primary-200 rounded-2xl">
+        ) : hasExisting ? (
+          <div className="mb-8 p-5 bg-emerald-50/60 border border-emerald-200/80 rounded-2xl transition-all duration-300">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-bold text-primary-900 flex items-center gap-2">
-                <Users className="w-4 h-4 text-primary-600" />
+              <p className="text-sm font-bold text-emerald-950 flex items-center gap-2">
+                <Users className="w-4 h-4 text-emerald-600" />
                 Kartu Keluarga Terdaftar:{" "}
-                <span className="font-mono text-primary-700 bg-white px-2 py-0.5 rounded border border-primary-200">
+                <span className="font-mono text-emerald-800 bg-white px-2 py-0.5 rounded border border-emerald-200">
                   {primaryApplicant?.family_card_number}
                 </span>
               </p>
-              <span className="text-xs font-medium text-primary-700 bg-primary-100 px-2 py-0.5 rounded-full">
+              <span className="text-xs font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
                 {existingApplicants.length} Anggota
               </span>
             </div>
@@ -497,7 +492,7 @@ export default function Register() {
               {existingApplicants.map((a) => (
                 <div
                   key={a.id}
-                  className="flex items-center justify-between bg-white rounded-xl px-3.5 py-2.5 border border-primary-100 shadow-xs"
+                  className="flex items-center justify-between bg-white rounded-xl px-3.5 py-2.5 border border-emerald-100 shadow-xs"
                 >
                   <div>
                     <p className="text-sm font-semibold text-neutral-800">{a.full_name}</p>
@@ -506,13 +501,12 @@ export default function Register() {
                     </p>
                   </div>
                   <span
-                    className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${
-                      a.status === "approved"
-                        ? "bg-emerald-100 text-emerald-700"
-                        : a.status === "rejected"
-                          ? "bg-red-100 text-red-700"
-                          : "bg-amber-100 text-amber-700"
-                    }`}
+                    className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${a.status === "approved"
+                      ? "bg-emerald-100 text-emerald-700"
+                      : a.status === "rejected"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-amber-100 text-amber-700"
+                      }`}
                   >
                     {a.status === "approved"
                       ? "Disetujui"
@@ -524,7 +518,7 @@ export default function Register() {
               ))}
             </div>
           </div>
-        )}
+        ) : null}
 
         {/* Kartu Pilihan Tipe */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -578,7 +572,7 @@ export default function Register() {
   const isKkLocked = regType === "add" && isKkFilled16 && !allowEditKK;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 animate-fade-in">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
       {/* Header */}
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-2 mb-3">
@@ -610,11 +604,10 @@ export default function Register() {
           <div key={s.num} className="flex items-center">
             <div className="flex flex-col items-center">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
-                  step >= s.num
-                    ? "bg-primary-500 text-white shadow-md"
-                    : "bg-neutral-200 text-neutral-500"
-                }`}
+                className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${step >= s.num
+                  ? "bg-primary-500 text-white shadow-md"
+                  : "bg-neutral-200 text-neutral-500"
+                  }`}
               >
                 {step > s.num ? (
                   <CheckCircle2 className="w-5 h-5" />
@@ -623,18 +616,16 @@ export default function Register() {
                 )}
               </div>
               <span
-                className={`text-xs mt-1.5 font-medium ${
-                  step >= s.num ? "text-primary-600" : "text-neutral-400"
-                }`}
+                className={`text-xs mt-1.5 font-medium ${step >= s.num ? "text-primary-600" : "text-neutral-400"
+                  }`}
               >
                 {s.label}
               </span>
             </div>
             {i < stepIndicators.length - 1 && (
               <div
-                className={`w-16 sm:w-24 h-0.5 mb-5 mx-2 transition-colors duration-300 ${
-                  step > s.num ? "bg-primary-500" : "bg-neutral-200"
-                }`}
+                className={`w-16 sm:w-24 h-0.5 mb-5 mx-2 transition-colors duration-300 ${step > s.num ? "bg-primary-500" : "bg-neutral-200"
+                  }`}
               />
             )}
           </div>
@@ -709,9 +700,8 @@ export default function Register() {
                       setErrors((p) => ({ ...p, family_card_number: null }));
                     }
                   }}
-                  className={`${errors.family_card_number ? "border-red-400" : ""} ${
-                    isKkLocked ? "bg-emerald-50/50 text-emerald-900 border-emerald-300 font-medium" : ""
-                  }`}
+                  className={`${errors.family_card_number ? "border-red-400" : ""} ${isKkLocked ? "bg-emerald-50/50 text-emerald-900 border-emerald-300 font-medium" : ""
+                    }`}
                   readOnly={isKkLocked}
                 />
                 {isKkLocked && (
@@ -1011,49 +1001,49 @@ export default function Register() {
         <Card className="animate-slide-up">
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                <Upload className="w-5 h-5 text-blue-500" />
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                <Upload className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
                 <CardTitle>Upload Dokumen</CardTitle>
                 <CardDescription>
-                  Unggah foto KTP, Kartu Keluarga, dan Pas Foto
+                  Unggah berkas Kartu Keluarga (wajib) dan KTP (opsional)
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-              <FileUploadBox
-                id="upload-ktp"
-                label="Foto KTP *"
-                icon={CreditCard}
-                fileKey="ktp"
-                accept="image/*,.pdf"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <FileUploadBox
                 id="upload-kk"
-                label="Foto Kartu Keluarga *"
+                label="Foto Kartu Keluarga (KK) *"
                 icon={Users}
                 fileKey="kk"
                 accept="image/*,.pdf"
                 note={prefilledKkUrl ? "✓ Telah terisi dari foto KK keluarga" : null}
               />
               <FileUploadBox
-                id="upload-photo"
-                label="Pas Foto *"
-                icon={Camera}
-                fileKey="photo"
-                accept="image/*"
+                id="upload-ktp"
+                label="Foto KTP (Opsional)"
+                icon={CreditCard}
+                fileKey="ktp"
+                accept="image/*,.pdf"
+                note="Boleh dikosongkan jika belum memiliki KTP"
               />
             </div>
 
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
-              <p className="font-semibold mb-1">📋 Persyaratan Dokumen:</p>
-              <ul className="list-disc list-inside space-y-1 text-amber-700">
-                <li>Foto KTP dan KK harus jelas dan terbaca</li>
-                <li>Pas foto berlatar belakang merah atau biru</li>
-                <li>Format file: JPG, PNG, atau PDF (maks. 5MB per file)</li>
+            <div className="bg-emerald-50/60 border border-emerald-200/80 rounded-xl p-4 text-sm text-emerald-950">
+              <p className="font-semibold mb-1 flex items-center gap-1.5">
+                <span>📋</span> Ketentuan Dokumen:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm text-emerald-800">
+                <li>
+                  <strong>Kartu Keluarga (KK):</strong> Wajib diunggah dan seluruh teks harus terbaca jelas.
+                </li>
+                <li>
+                  <strong>KTP:</strong> Bersifat opsional (disarankan jika pendaftar sudah memiliki KTP).
+                </li>
+                <li>Format file yang didukung: JPG, PNG, atau PDF (maksimal 5MB per file).</li>
               </ul>
             </div>
 
