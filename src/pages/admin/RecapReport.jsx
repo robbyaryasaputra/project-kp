@@ -8,13 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableHeader,
@@ -143,7 +137,10 @@ export default function RecapReport() {
       toast.error("NIK harus 16 digit angka.");
       return;
     }
-    if (!formData.family_card_number || formData.family_card_number.length !== 16) {
+    if (
+      !formData.family_card_number ||
+      formData.family_card_number.length !== 16
+    ) {
       toast.error("Nomor Kartu Keluarga harus 16 digit.");
       return;
     }
@@ -151,7 +148,8 @@ export default function RecapReport() {
     setSaving(true);
     try {
       const payload = {
-        registration_code: formData.registration_code || generateRegistrationCode(),
+        registration_code:
+          formData.registration_code || generateRegistrationCode(),
         card_number: formData.card_number?.trim() || null,
         full_name: formData.full_name.trim(),
         nik: formData.nik.trim(),
@@ -187,7 +185,9 @@ export default function RecapReport() {
       fetchData();
     } catch (err) {
       console.error(err);
-      toast.error("Gagal menambahkan data: " + (err.message || "Terjadi kesalahan"));
+      toast.error(
+        "Gagal menambahkan data: " + (err.message || "Terjadi kesalahan"),
+      );
     } finally {
       setSaving(false);
     }
@@ -232,7 +232,10 @@ export default function RecapReport() {
       toast.error("NIK harus 16 digit angka.");
       return;
     }
-    if (!formData.family_card_number || formData.family_card_number.length !== 16) {
+    if (
+      !formData.family_card_number ||
+      formData.family_card_number.length !== 16
+    ) {
       toast.error("Nomor Kartu Keluarga harus 16 digit.");
       return;
     }
@@ -275,7 +278,9 @@ export default function RecapReport() {
       fetchData();
     } catch (err) {
       console.error(err);
-      toast.error("Gagal memperbarui data: " + (err.message || "Terjadi kesalahan"));
+      toast.error(
+        "Gagal memperbarui data: " + (err.message || "Terjadi kesalahan"),
+      );
     } finally {
       setSaving(false);
     }
@@ -298,13 +303,17 @@ export default function RecapReport() {
 
       if (error) throw error;
 
-      toast.success(`Data pendaftar ${selectedItem.full_name} berhasil dihapus.`);
+      toast.success(
+        `Data pendaftar ${selectedItem.full_name} berhasil dihapus.`,
+      );
       setShowDeleteModal(false);
       setSelectedItem(null);
       fetchData();
     } catch (err) {
       console.error(err);
-      toast.error("Gagal menghapus data: " + (err.message || "Terjadi kesalahan"));
+      toast.error(
+        "Gagal menghapus data: " + (err.message || "Terjadi kesalahan"),
+      );
     } finally {
       setDeleting(false);
     }
@@ -330,7 +339,7 @@ export default function RecapReport() {
 
   const getGenderLabel = (g) => (g === 1 ? "L" : "P");
   const getPisatLabel = (p) =>
-    ({ 1: "Peserta", 2: "Suami", 3: "Istri", 4: "Anak" }[p] || "-");
+    ({ 1: "Peserta", 2: "Suami", 3: "Istri", 4: "Anak" })[p] || "-";
 
   const filteredData = data.filter((a) => {
     const q = searchQuery.toLowerCase();
@@ -353,12 +362,12 @@ export default function RecapReport() {
             <FileSpreadsheet className="w-6 h-6 text-primary-500" />
             Rekapitulasi Data Peserta
           </h1>
-          <p className="text-sm text-neutral-500 mt-1">
-            Kelola, perbarui, hapus, dan export data pendaftaran BPJS Kesehatan
-          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button onClick={handleOpenCreate} className="flex items-center gap-1.5">
+          <Button
+            onClick={handleOpenCreate}
+            className="flex items-center gap-1.5"
+          >
             <Plus className="w-4 h-4" />
             Tambah Data Rekap
           </Button>
@@ -470,9 +479,6 @@ export default function RecapReport() {
                       ? "Ditolak"
                       : "Semua Status"}
               </CardTitle>
-              <CardDescription>
-                Daftar lengkap pendaftar dengan aksi Edit data dan Hapus
-              </CardDescription>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <div className="relative">
@@ -583,8 +589,12 @@ export default function RecapReport() {
                               : "Pending"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-xs text-neutral-600 max-w-[140px] truncate" title={item.notes || ""}>
-                        {item.notes || (item.status === "approved" ? "Disetujui" : "-")}
+                      <TableCell
+                        className="text-xs text-neutral-600 max-w-[140px] truncate"
+                        title={item.notes || ""}
+                      >
+                        {item.notes ||
+                          (item.status === "approved" ? "Disetujui" : "-")}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1.5">
@@ -704,7 +714,9 @@ export default function RecapReport() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="create-kk">No. Kartu Keluarga (16 Digit) *</Label>
+                <Label htmlFor="create-kk">
+                  No. Kartu Keluarga (16 Digit) *
+                </Label>
                 <Input
                   id="create-kk"
                   required
@@ -756,7 +768,10 @@ export default function RecapReport() {
                   id="create-marital"
                   value={formData.marital_status}
                   onChange={(e) =>
-                    setFormData((p) => ({ ...p, marital_status: e.target.value }))
+                    setFormData((p) => ({
+                      ...p,
+                      marital_status: e.target.value,
+                    }))
                   }
                 >
                   <option value="0">Tidak Diketahui</option>
@@ -905,7 +920,9 @@ export default function RecapReport() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="create-notes">Status / Keterangan Rekap (Masuk ke Excel)</Label>
+              <Label htmlFor="create-notes">
+                Status / Keterangan Rekap (Masuk ke Excel)
+              </Label>
               <Input
                 id="create-notes"
                 placeholder="Contoh: Disetujui, Aktif, PBI APBD, dll"
@@ -1076,7 +1093,10 @@ export default function RecapReport() {
                   id="edit-marital"
                   value={formData.marital_status}
                   onChange={(e) =>
-                    setFormData((p) => ({ ...p, marital_status: e.target.value }))
+                    setFormData((p) => ({
+                      ...p,
+                      marital_status: e.target.value,
+                    }))
                   }
                 >
                   <option value="0">Tidak Diketahui</option>
@@ -1215,7 +1235,9 @@ export default function RecapReport() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="edit-notes">Status / Keterangan Rekap (Masuk ke Excel)</Label>
+              <Label htmlFor="edit-notes">
+                Status / Keterangan Rekap (Masuk ke Excel)
+              </Label>
               <Input
                 id="edit-notes"
                 placeholder="Contoh: Disetujui, Aktif, PBI APBD, dll"
@@ -1260,7 +1282,8 @@ export default function RecapReport() {
               Konfirmasi Hapus Data
             </DialogTitle>
             <DialogDescription>
-              Tindakan ini tidak dapat dibatalkan. Data pendaftar akan dihapus permanen dari basis data.
+              Tindakan ini tidak dapat dibatalkan. Data pendaftar akan dihapus
+              permanen dari basis data.
             </DialogDescription>
           </DialogHeader>
 
@@ -1272,10 +1295,12 @@ export default function RecapReport() {
                 </p>
                 <ul className="text-red-800 space-y-1 text-xs">
                   <li>
-                    <span className="font-semibold">Nama:</span> {selectedItem.full_name}
+                    <span className="font-semibold">Nama:</span>{" "}
+                    {selectedItem.full_name}
                   </li>
                   <li>
-                    <span className="font-semibold">NIK:</span> {selectedItem.nik}
+                    <span className="font-semibold">NIK:</span>{" "}
+                    {selectedItem.nik}
                   </li>
                   <li>
                     <span className="font-semibold">Kode Registrasi:</span>{" "}
