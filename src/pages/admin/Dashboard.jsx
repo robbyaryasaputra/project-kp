@@ -752,9 +752,6 @@ export default function AdminDashboard({ isVerification = false }) {
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-neutral-900">
             Antrean Verifikasi Pendaftar
           </h1>
-          <p className="text-sm text-neutral-500 mt-0.5">
-            Periksa dokumen identitas dan terbitkan nomor kartu BPJS Kesehatan peserta.
-          </p>
         </div>
 
         {/* Counter Pill */}
@@ -843,9 +840,6 @@ export default function AdminDashboard({ isVerification = false }) {
             <CardTitle className="text-base font-bold text-neutral-900">
               Daftar Antrean Aktif
             </CardTitle>
-            <CardDescription className="text-xs text-neutral-500 mt-0.5">
-              Urutan berdasarkan waktu pengajuan pendaftaran (FIFO)
-            </CardDescription>
           </div>
 
           {/* Search Box */}
