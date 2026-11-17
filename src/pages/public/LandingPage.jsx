@@ -571,7 +571,7 @@ export default function LandingPage() {
               Prosedur Sederhana
             </span>
             <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-              Alur Pendaftaran BPJS Mandiri
+              Alur Pendaftaran BPJS Pemerintah
             </h2>
             <p className="text-neutral-400 text-sm sm:text-base leading-relaxed">
               Cukup 4 tahapan ringkas untuk mendaftarkan diri dan keluarga dalam jaminan

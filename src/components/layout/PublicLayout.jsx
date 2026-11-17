@@ -83,14 +83,12 @@ export default function PublicLayout() {
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
                   <span className="text-sm sm:text-base font-bold text-neutral-900 tracking-tight leading-tight group-hover:text-emerald-700 transition-colors">
-                    BPJS Kesehatan
+                    DINKES KOTA DUMAI
                   </span>
-                  <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/70 rounded-full font-mono">
-                    Kota Dumai
-                  </span>
+                  
                 </div>
                 <p className="text-[11px] text-neutral-500 leading-tight hidden sm:block font-normal mt-0.5">
-                  Layanan Pendaftaran Mandiri
+                  Layanan Pendaftaran
                 </p>
               </div>
             </Link>
@@ -285,7 +283,7 @@ export default function PublicLayout() {
                 />
               </div>
               <span>
-                © 2026 Dinas Kesehatan Kota Dumai · Layanan Pendaftaran BPJS Mandiri
+                © 2026 Dinas Kesehatan Kota Dumai · Layanan Pendaftaran BPJS Pemerintah Kota Dumai
               </span>
             </div>
             <Link

@@ -86,7 +86,7 @@ export default function AdminLogin() {
                 />
               </div>
               <div>
-                <p className="text-sm font-bold tracking-wide">DINKES DUMAI</p>
+                <p className="text-sm font-bold tracking-wide">DINKES KOTA DUMAI</p>
                 <p className="text-xs text-white/70">Layanan BPJS Kesehatan</p>
               </div>
             </div>
@@ -225,7 +225,7 @@ export default function AdminLogin() {
         </div>
 
         <p className="mt-5 text-center text-xs text-neutral-500">
-          © 2026 Dinas Kesehatan Kota Dumai · Layanan Pendaftaran BPJS Mandiri
+          © 2026 Dinas Kesehatan Kota Dumai · Layanan Pendaftaran BPJS Pemerintah Kota Dumai
         </p>
       </div>
     </main>
