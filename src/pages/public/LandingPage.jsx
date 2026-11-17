@@ -1,737 +1,556 @@
 import { Link } from "react-router-dom";
-import { motion, useScroll, useSpring } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
-  Shield,
-  FileText,
-  Search,
-  CheckCircle2,
   ArrowRight,
   ArrowUpRight,
-  Users,
-  Clock,
   BadgeCheck,
-  UserPlus,
-  Sparkles,
-  Lock,
-  Smartphone,
-  CreditCard,
   Building2,
-  ChevronRight,
   Check,
+  CheckCircle2,
+  ChevronDown,
+  CreditCard,
+  FileCheck2,
+  FileText,
+  HeartPulse,
+  LockKeyhole,
+  MapPin,
+  Search,
   ShieldCheck,
-  Zap,
+  Smartphone,
+  UsersRound,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import logoDinkes from "@/assets/logo-dinkes.jpg";
 import { useAuth } from "@/context/AuthContext";
 
-/* ── Elite Awwwards Easing Curves & Motion Variants ── */
-const EASE_AWWWARDS = [0.16, 1, 0.3, 1]; // power4.out
+const EASE = [0.16, 1, 0.3, 1];
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 35 },
-  visible: (custom = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.75,
-      delay: custom * 0.1,
-      ease: EASE_AWWWARDS,
-    },
-  }),
-};
+const stats = [
+  { value: "100%", label: "Cakupan semesta warga", accent: "text-primary-700" },
+  { value: "Rp 0", label: "Iuran ditanggung APBD", accent: "text-emerald-700" },
+  { value: "7", label: "Kecamatan di Kota Dumai", accent: "text-neutral-900" },
+  { value: "Resmi", label: "Program Pemerintah Kota", accent: "text-primary-700" },
+];
 
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.08,
-    },
+const advantages = [
+  {
+    icon: FileText,
+    title: "Pendaftaran BPJS PBI Gratis",
+    description:
+      "Ajukan pendaftaran secara online dan lengkapi data keluarga dalam satu portal.",
+    points: [
+      "Untuk warga Kota Dumai sesuai ketentuan program",
+      "Satu akun untuk data satu Kartu Keluarga",
+      "Tidak dipungut biaya pendaftaran",
+    ],
+    action: "Mulai pendaftaran",
+    to: "/register",
   },
-};
-
-const cardItem = {
-  hidden: { opacity: 0, y: 30, scale: 0.98 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.7,
-      ease: EASE_AWWWARDS,
-    },
+  {
+    icon: Search,
+    title: "Pantau Status Pendaftaran",
+    description:
+      "Lihat perkembangan pengajuan dengan NIK dan kode pendaftaran, tanpa harus masuk akun.",
+    points: [
+      "Informasi status pengajuan",
+      "Catatan verifikasi dari petugas",
+      "Bisa diakses kapan saja",
+    ],
+    action: "Cek status",
+    to: "/cek-status",
   },
-};
+  {
+    icon: Building2,
+    title: "Pilih Fasilitas Kesehatan",
+    description:
+      "Tentukan Puskesmas atau Klinik Pratama tingkat pertama yang sesuai dengan domisili.",
+    points: [
+      "Pilihan faskes tingkat pertama",
+      "Sesuaikan dengan wilayah tempat tinggal",
+      "Data faskes diisi pada formulir",
+    ],
+    action: "Lihat alur",
+    to: "#alur",
+  },
+];
+
+const steps = [
+  {
+    number: "01",
+    title: "Siapkan NIK & Kartu Keluarga",
+    description:
+      "Pastikan data kependudukan aktif dan sesuai dengan identitas warga Kota Dumai.",
+    note: "KK dan NIK peserta",
+  },
+  {
+    number: "02",
+    title: "Isi formulir pendaftaran",
+    description:
+      "Buat akun, lengkapi informasi keluarga, alamat, dan pilihan fasilitas kesehatan.",
+    note: "Proses online",
+  },
+  {
+    number: "03",
+    title: "Pantau proses verifikasi",
+    description:
+      "Simpan kode pendaftaran dan gunakan bersama NIK untuk melihat status pengajuan.",
+    note: "Cek status kapan saja",
+  },
+];
+
+const facilities = [
+  { name: "Puskesmas Kota Dumai", district: "Dumai Kota" },
+  { name: "Puskesmas Jaya Mukti", district: "Dumai Timur" },
+  { name: "Puskesmas Bumi Ayu", district: "Dumai Selatan" },
+  { name: "Puskesmas Dumai Barat", district: "Dumai Barat" },
+];
+
+const commitments = [
+  {
+    icon: LockKeyhole,
+    title: "Data dijaga",
+    description:
+      "Informasi pendaftar digunakan untuk kebutuhan pengajuan dan verifikasi.",
+  },
+  {
+    icon: HeartPulse,
+    title: "Layanan kesehatan",
+    description:
+      "Program membantu warga mengakses perlindungan kesehatan sesuai ketentuan.",
+  },
+  {
+    icon: Smartphone,
+    title: "Akses lebih mudah",
+    description:
+      "Formulir pendaftaran dan cek status dapat diakses melalui ponsel maupun komputer.",
+  },
+  {
+    icon: BadgeCheck,
+    title: "Proses tercatat",
+    description:
+      "Kode pendaftaran membantu warga menelusuri status pengajuan dengan jelas.",
+  },
+];
+
+const questions = [
+  {
+    question: "Siapa yang dapat mengajukan pendaftaran?",
+    answer:
+      "Layanan ini ditujukan untuk warga Kota Dumai. Pengajuan akan diperiksa berdasarkan data dan ketentuan program yang berlaku.",
+  },
+  {
+    question: "Data dan dokumen apa yang perlu disiapkan?",
+    answer:
+      "Siapkan NIK dan nomor Kartu Keluarga. Formulir akan memberi petunjuk dokumen yang perlu diunggah; Kartu Keluarga diperlukan untuk pengajuan.",
+  },
+  {
+    question: "Bagaimana cara melihat status pendaftaran?",
+    answer:
+      "Buka menu Cek Status, lalu masukkan NIK peserta dan kode pendaftaran yang diperoleh setelah mengirim formulir.",
+  },
+  {
+    question: "Berapa lama proses verifikasi berlangsung?",
+    answer:
+      "Waktu verifikasi bergantung pada antrean dan kelengkapan data. Periksa status secara berkala untuk melihat pembaruan dari petugas.",
+  },
+];
+
+function Reveal({ children, className = "", delay = 0 }) {
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <motion.div
+      initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.16 }}
+      transition={{ duration: 0.55, delay, ease: EASE }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function SectionHeading({ eyebrow, title, description }) {
+  return (
+    <div className="mx-auto mb-10 max-w-2xl text-center sm:mb-12">
+      <p className="mb-3 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-primary-700">
+        <span className="h-px w-5 bg-emerald-500" />
+        {eyebrow}
+        <span className="h-px w-5 bg-emerald-500" />
+      </p>
+      <h2 className="text-3xl font-bold leading-tight tracking-tight text-neutral-900 sm:text-4xl">
+        {title}
+      </h2>
+      <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-neutral-600 sm:text-base">
+        {description}
+      </p>
+    </div>
+  );
+}
 
 export default function LandingPage() {
   const { user } = useAuth();
-
-  // Scroll Progress Bar
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001,
-  });
-
-  const bentoSteps = [
-    {
-      step: "01",
-      title: "Buat Akun Portal",
-      tag: "Akun Mandiri",
-      description:
-        "Registrasi dengan email dan kata sandi aman. Satu akun portal dapat digunakan untuk seluruh anggota keluarga Anda.",
-      highlight: "1 Akun = 1 Kartu Keluarga",
-    },
-    {
-      step: "02",
-      title: "Lengkapi Data Diri",
-      tag: "Data Terpadu",
-      description:
-        "Isi data NIK, No. KK, domisili, dan pilih Fasilitas Kesehatan Tingkat I (Puskesmas/Klinik Pratama) terdekat.",
-      highlight: "Otomatisasi No. KK Anggota",
-    },
-    {
-      step: "03",
-      title: "Unggah Dokumen",
-      tag: "100% Digital",
-      description:
-        "Unggah berkas Kartu Keluarga (KK wajib) dan KTP (opsional) langsung dari smartphone atau komputer tanpa perlu berkas fisik.",
-      highlight: "Format JPG, PNG, atau PDF",
-    },
-    {
-      step: "04",
-      title: "Verifikasi & Terbit Kartu",
-      tag: "Resmi & Cepat",
-      description:
-        "Petugas memverifikasi berkas dan menerbitkan Nomor Kartu BPJS Kesehatan resmi yang siap diunduh dalam format PDF.",
-      highlight: "Unduh Bukti Sah Ber-Barcode",
-    },
-  ];
+  const registrationPath = user ? "/register" : "/login";
 
   return (
-    <div className="relative space-y-24 sm:space-y-32 pb-24 overflow-x-hidden">
-      {/* ── Top Scroll Progress Bar (Awwwards Signature) Underneath Header ── */}
-      <motion.div
-        style={{ scaleX }}
-        className="fixed top-16 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 via-primary-500 to-accent-400 origin-left z-30 pointer-events-none opacity-80"
-      />
+    <div className="overflow-hidden bg-neutral-50 text-neutral-900">
+      <section className="relative isolate overflow-hidden bg-gradient-to-br from-secondary-50 via-neutral-50 to-white">
+        <div className="pointer-events-none absolute -left-36 top-12 h-80 w-80 rounded-full bg-emerald-100/70 blur-3xl" />
+        <div className="pointer-events-none absolute -right-36 bottom-0 h-96 w-96 rounded-full bg-primary-100/60 blur-3xl" />
 
-      {/* ══════════════════════════════════════════════════════════════
-          1. HERO SECTION: NEXT-GEN HEALTHCARE PORTAL (STATEMENT HERO)
-      ══════════════════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden bg-neutral-950 text-white pt-20 pb-24 sm:pt-28 sm:pb-32 lg:pt-36 lg:pb-40 border-b border-neutral-800/80">
-        {/* Dynamic Background Dot Matrix */}
-        <div className="absolute inset-0 bg-grid-dots-dark opacity-40 pointer-events-none" />
+        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 pb-20 pt-12 sm:px-6 sm:pb-24 sm:pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 lg:pt-20">
+          <div className="relative z-10">
+            <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary-100 bg-white/80 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-primary-800 shadow-sm sm:text-[11px]">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              Pemerintah Kota Dumai · Dinas Kesehatan
+            </p>
 
-        {/* Ambient Glowing Orbs */}
-        <motion.div
-          animate={{ scale: [1, 1.08, 1], opacity: [0.15, 0.25, 0.15] }}
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-          className="pointer-events-none absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-primary-500/20 blur-[130px]"
-        />
-        <motion.div
-          animate={{ scale: [1, 1.1, 1], opacity: [0.12, 0.22, 0.12] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="pointer-events-none absolute top-1/2 -right-40 h-[550px] w-[550px] -translate-y-1/2 rounded-full bg-emerald-500/15 blur-[140px]"
-        />
-        <div className="pointer-events-none absolute -bottom-32 left-1/3 h-80 w-80 rounded-full bg-accent-400/10 blur-[120px]" />
+            <h1 className="max-w-3xl text-[clamp(2.5rem,5vw,4.2rem)] font-extrabold leading-[1.04] tracking-[-0.045em] text-primary-950">
+              Program JKN BPJS Kesehatan Gratis Warga Kota Dumai.
+              <span className="mt-1 block text-primary-600">
+                100% Bebas Iuran APBD.
+              </span>
+            </h1>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-            {/* Left Content (7 Cols) */}
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={staggerContainer}
-              className="lg:col-span-7 space-y-7 text-left"
-            >
-              {/* Top Status Pill */}
-              <motion.div variants={fadeInUp} custom={0}>
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-semibold text-emerald-300 backdrop-blur-md shadow-xs">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                  </span>
-                  <span>Sistem Pendaftaran Digital BPJS Kesehatan</span>
-                  <span className="text-neutral-500">·</span>
-                  <span className="text-neutral-300 font-mono text-[11px]">v2.6</span>
-                </div>
-              </motion.div>
+            <p className="mt-5 max-w-xl text-base leading-7 text-neutral-600 sm:text-lg">
+              Ajukan kepesertaan secara digital. Siapkan NIK dan nomor Kartu
+              Keluarga, lalu pantau status permohonan dari satu portal.
+            </p>
 
-              {/* Massive Main Heading */}
-              <motion.h1
-                variants={fadeInUp}
-                custom={1}
-                className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] text-white"
-              >
-                Jaminan Kesehatan{" "}
-                <br className="hidden sm:block" />
-                Nasional,{" "}
-                <span className="bg-gradient-to-r from-emerald-300 via-teal-200 to-primary-300 bg-clip-text text-transparent">
-                  Kini 100% Digital.
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <Link to={registrationPath} className="no-underline">
+                <span className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary-800 px-6 text-sm font-bold text-white shadow-lg shadow-primary-900/15 transition-colors hover:bg-primary-700 sm:w-auto">
+                  Ajukan pendaftaran gratis
+                  <ArrowRight className="h-4 w-4" />
                 </span>
-              </motion.h1>
-
-              {/* Subtitle */}
-              <motion.p
-                variants={fadeInUp}
-                custom={2}
-                className="text-base sm:text-lg text-neutral-300 leading-relaxed max-w-xl"
-              >
-                Daftarkan diri dan seluruh anggota keluarga dalam satu Kartu Keluarga
-                secara online. Tanpa perlu antre di kantor cabang, pantau status verifikasi
-                secara transparan kapan saja.
-              </motion.p>
-
-              {/* CTA Action Buttons */}
-              <motion.div
-                variants={fadeInUp}
-                custom={3}
-                className="flex flex-wrap items-center gap-4 pt-2"
-              >
-                <Link to={user ? "/register" : "/login"} className="no-underline">
-                  <Button
-                    size="lg"
-                    className="h-13 px-7 text-sm font-bold bg-emerald-500 hover:bg-emerald-600 text-neutral-950 shadow-xl shadow-emerald-500/25 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] rounded-xl flex items-center gap-2 group cursor-pointer"
-                  >
-                    <FileText className="w-4 h-4 text-neutral-950 transition-transform group-hover:rotate-6" />
-                    <span>Mulai Pendaftaran</span>
-                    <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                </Link>
-
-                <Link to="/cek-status" className="no-underline">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="h-13 px-6 text-sm font-semibold bg-white/5 border-white/15 text-white hover:bg-white/10 hover:text-white backdrop-blur-md rounded-xl transition-all cursor-pointer flex items-center gap-2"
-                  >
-                    <Search className="w-4 h-4 text-neutral-300" />
-                    <span>Cek Status Berkas</span>
-                  </Button>
-                </Link>
-              </motion.div>
-
-              {/* Key Trust Signals */}
-              <motion.div
-                variants={fadeInUp}
-                custom={4}
-                className="pt-6 border-t border-white/10 flex flex-wrap items-center gap-6 text-xs text-neutral-400"
-              >
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>1 Akun untuk 1 Keluarga</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>Verifikasi Cepat Petugas</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>Bukti PDF Sah Ber-Barcode</span>
-                </div>
-              </motion.div>
-            </motion.div>
-
-            {/* Right Visual: Holographic Digital Card Simulation (5 Cols) */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 40 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.9, ease: EASE_AWWWARDS, delay: 0.2 }}
-              className="lg:col-span-5 relative flex justify-center"
-            >
-              {/* Outer Glow Halo */}
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-primary-500/20 via-emerald-500/20 to-transparent blur-2xl transform scale-95" />
-
-              {/* The Holographic Card */}
-              <motion.div
-                animate={{ y: [-5, 6, -5], rotateZ: [-0.3, 0.4, -0.3] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                className="relative w-full max-w-md card-hologram rounded-3xl p-6 sm:p-7 text-white shadow-2xl border border-white/20 backdrop-blur-xl"
-              >
-                {/* Chip & Logo Header */}
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-md">
-                      <Shield className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-black tracking-widest uppercase text-white/90">
-                        BPJS KESEHATAN
-                      </h4>
-                      <p className="text-[10px] text-white/60 tracking-wider">
-                        KARTU INDONESIA SEHAT (KIS)
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Golden Smart Chip Graphic */}
-                  <div className="w-11 h-8 rounded-lg bg-gradient-to-br from-amber-300 via-amber-400 to-amber-600 border border-amber-200/50 shadow-inner flex flex-col justify-around p-1">
-                    <div className="h-0.5 w-full bg-amber-700/40 rounded-full" />
-                    <div className="h-0.5 w-full bg-amber-700/40 rounded-full" />
-                    <div className="h-0.5 w-full bg-amber-700/40 rounded-full" />
-                  </div>
-                </div>
-
-                {/* Card Number Mock */}
-                <div className="mb-6 space-y-1">
-                  <p className="text-[9px] uppercase tracking-widest text-white/50 font-bold">
-                    NOMOR KARTU DIGITAL
-                  </p>
-                  <p className="text-xl sm:text-2xl font-black font-mono tracking-widest text-white drop-shadow-sm">
-                    0001 8492 7391 8290
-                  </p>
-                </div>
-
-                {/* Holder Details */}
-                <div className="grid grid-cols-2 gap-4 pt-3 border-t border-white/15 text-left">
-                  <div>
-                    <p className="text-[9px] uppercase tracking-widest text-white/50 font-bold">
-                      NAMA PESERTA
-                    </p>
-                    <p className="text-xs sm:text-sm font-bold text-white tracking-wide truncate">
-                      WARGA NEGARA INDONESIA
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[9px] uppercase tracking-widest text-white/50 font-bold">
-                      STATUS KEPESERTAAN
-                    </p>
-                    <p className="text-xs sm:text-sm font-bold text-emerald-300 flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                      AKTIF - PBI / NON-PBI
-                    </p>
-                  </div>
-                </div>
-
-                {/* Micro Floating Badges */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5, duration: 0.6 }}
-                  className="absolute -bottom-4 -left-4 glass rounded-2xl px-3.5 py-2 flex items-center gap-2.5 text-xs font-bold text-neutral-800 shadow-xl border border-white/50"
-                >
-                  <div className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span>1 Akun = 1 Keluarga</span>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6, duration: 0.6 }}
-                  className="absolute -top-4 -right-4 glass rounded-2xl px-3.5 py-2 flex items-center gap-2.5 text-xs font-bold text-neutral-800 shadow-xl border border-white/50"
-                >
-                  <div className="w-6 h-6 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
-                    <Zap className="w-3.5 h-3.5" />
-                  </div>
-                  <span>Verifikasi &lt; 24 Jam</span>
-                </motion.div>
-              </motion.div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════
-          2. STATS BAR (TACTILE METRIC STRIP WITH SCROLL REVEAL)
-      ══════════════════════════════════════════════════════════════ */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 -mt-12 sm:-mt-16 relative z-20">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={staggerContainer}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6"
-        >
-          {[
-            {
-              icon: Users,
-              value: "1 Akun Keluarga",
-              label: "Daftarkan kepala keluarga & anggota dalam 1 KK",
-              accent: "text-primary-600 bg-primary-50",
-            },
-            {
-              icon: ShieldCheck,
-              value: "Proses Cepat & Resmi",
-              label: "Diverifikasi langsung oleh petugas berwenang",
-              accent: "text-emerald-600 bg-emerald-50",
-            },
-            {
-              icon: Clock,
-              value: "Layanan 24/7",
-              label: "Daftar dan lacak progres kapan saja dari mana saja",
-              accent: "text-amber-600 bg-amber-50",
-            },
-          ].map((stat, i) => (
-            <motion.div
-              key={i}
-              variants={cardItem}
-              whileHover={{ y: -6, transition: { duration: 0.25, ease: EASE_AWWWARDS } }}
-              className="glass-card rounded-2xl p-6 sm:p-7 flex items-start gap-4 transition-all duration-300 hover:shadow-xl hover:border-primary-300 group cursor-default"
-            >
-              <div
-                className={`w-12 h-12 rounded-2xl ${stat.accent} flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110 shadow-xs`}
-              >
-                <stat.icon className="w-6 h-6" />
-              </div>
-              <div className="space-y-1 text-left">
-                <h3 className="text-base sm:text-lg font-bold text-neutral-900 leading-snug">
-                  {stat.value}
-                </h3>
-                <p className="text-xs text-neutral-500 leading-relaxed">
-                  {stat.label}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════
-          3. BENTO GRID: FITUR UTAMA & KEUNGGULAN (SCROLL REVEAL)
-      ══════════════════════════════════════════════════════════════ */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6">
-        {/* Section Heading */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={fadeInUp}
-          className="text-center max-w-2xl mx-auto mb-14 space-y-3"
-        >
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-50 text-primary-700 text-xs font-bold border border-primary-100">
-            <Sparkles className="w-3.5 h-3.5" />
-            Fitur Portal Terintegrasi
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-black text-neutral-900 tracking-tight">
-            Kemudahan Layanan dalam Satu Ekosistem
-          </h2>
-          <p className="text-neutral-500 text-sm sm:text-base leading-relaxed">
-            Dirancang khusus untuk memberikan pengalaman pendaftaran BPJS Kesehatan
-            yang mulus, transparan, dan terpercaya bagi seluruh keluarga Indonesia.
-          </p>
-        </motion.div>
-
-        {/* Asymmetric Bento Grid */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.15 }}
-          variants={staggerContainer}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
-        >
-          {/* Bento Item 1: Wide Card (Span 2) */}
-          <motion.div
-            variants={cardItem}
-            whileHover={{ y: -6, transition: { duration: 0.3, ease: EASE_AWWWARDS } }}
-            className="md:col-span-2 glass-card rounded-3xl p-7 sm:p-9 relative overflow-hidden flex flex-col justify-between group hover:border-primary-400 transition-all duration-300 hover:shadow-xl text-left"
-          >
-            <div className="space-y-3 z-10 max-w-md">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-primary-600 bg-primary-50 px-2.5 py-1 rounded-md border border-primary-200/60">
-                Inovasi Baru
-              </span>
-              <h3 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight leading-tight">
-                1 Akun untuk Seluruh Anggota Keluarga
-              </h3>
-              <p className="text-sm text-neutral-500 leading-relaxed">
-                Tidak perlu membuat akun berulang kali. Cukup daftar sekali sebagai Kepala
-                Keluarga, lalu tambahkan istri dan anak ke dalam Nomor Kartu Keluarga yang sama
-                secara otomatis.
-              </p>
-            </div>
-
-            {/* Family Members Visual Mock */}
-            <div className="mt-8 pt-6 border-t border-neutral-100 grid grid-cols-1 sm:grid-cols-3 gap-3 z-10">
-              {[
-                { role: "Kepala Keluarga", name: "Peserta Utama", pisat: "PISAT 1" },
-                { role: "Pasangan", name: "Suami / Istri", pisat: "PISAT 2/3" },
-                { role: "Tanggungan", name: "Anak Kandung", pisat: "PISAT 4" },
-              ].map((m, idx) => (
-                <div
-                  key={idx}
-                  className="bg-neutral-50 rounded-2xl p-3.5 border border-neutral-200/80 group-hover:bg-primary-50/40 transition-colors"
-                >
-                  <p className="text-[10px] font-bold text-primary-700 uppercase">
-                    {m.pisat}
-                  </p>
-                  <p className="text-xs font-bold text-neutral-900 mt-0.5">{m.role}</p>
-                  <p className="text-[11px] text-neutral-400">{m.name}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Decorative Background Blob */}
-            <div className="absolute right-0 bottom-0 w-80 h-80 rounded-full bg-primary-100/40 blur-3xl pointer-events-none -mr-20 -mb-20" />
-          </motion.div>
-
-          {/* Bento Item 2: Process Fast Card */}
-          <motion.div
-            variants={cardItem}
-            whileHover={{ y: -6, transition: { duration: 0.3, ease: EASE_AWWWARDS } }}
-            className="glass-card rounded-3xl p-7 sm:p-8 flex flex-col justify-between group hover:border-amber-400 transition-all duration-300 hover:shadow-xl text-left"
-          >
-            <div className="space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
-                <Clock className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-neutral-900 tracking-tight">
-                Verifikasi Cepat &amp; Terpantau
-              </h3>
-              <p className="text-xs text-neutral-500 leading-relaxed">
-                Berkas pendaftaran Anda langsung diproses antreannya oleh petugas admin.
-                Dapatkan nomor kartu BPJS resmi tanpa harus menunggu berhari-hari.
-              </p>
-            </div>
-
-            <div className="mt-6 pt-4 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-400">
-              <span>SLA Verifikasi</span>
-              <span className="font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
-                &lt; 24 Jam Kerja
-              </span>
-            </div>
-          </motion.div>
-
-          {/* Bento Item 3: Status Tracking Card */}
-          <motion.div
-            variants={cardItem}
-            whileHover={{ y: -6, transition: { duration: 0.3, ease: EASE_AWWWARDS } }}
-            className="glass-card rounded-3xl p-7 sm:p-8 flex flex-col justify-between group hover:border-blue-400 transition-all duration-300 hover:shadow-xl text-left"
-          >
-            <div className="space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
-                <Search className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-neutral-900 tracking-tight">
-                Pantau Status Tanpa Login
-              </h3>
-              <p className="text-xs text-neutral-500 leading-relaxed">
-                Ingin cek berkas cepat? Cukup masukkan NIK dan Kode Registrasi Anda di menu
-                Cek Status tanpa harus login terlebih dahulu.
-              </p>
-            </div>
-
-            <div className="mt-6 pt-4 border-t border-neutral-100">
+              </Link>
               <Link
                 to="/cek-status"
-                className="inline-flex items-center text-xs font-bold text-blue-600 hover:text-blue-700 no-underline group-hover:translate-x-1 transition-transform"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-800 no-underline transition-colors hover:border-primary-300 hover:bg-primary-50"
               >
-                Cek Status Sekarang <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                <Search className="h-4 w-4 text-primary-700" />
+                Cek status
               </Link>
             </div>
-          </motion.div>
 
-          {/* Bento Item 4: Digital Proof Card (Span 2) */}
-          <motion.div
-            variants={cardItem}
-            whileHover={{ y: -6, transition: { duration: 0.3, ease: EASE_AWWWARDS } }}
-            className="md:col-span-2 glass-card rounded-3xl p-7 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 group hover:border-emerald-400 transition-all duration-300 hover:shadow-xl text-left"
-          >
-            <div className="space-y-3 max-w-sm text-left">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
-                <BadgeCheck className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight">
-                Bukti Pendaftaran Digital PDF Sah
-              </h3>
-              <p className="text-xs text-neutral-500 leading-relaxed">
-                Setelah pendaftaran disetujui petugas, Anda dapat langsung mengunduh
-                lembar bukti pendaftaran ber-barcode resmi yang diakui di seluruh faskes tingkat I.
-              </p>
+            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 border-t border-neutral-200/80 pt-5 text-xs font-medium text-neutral-600">
+              {["NIK & KK", "Proses online", "Status transparan"].map((item) => (
+                <span key={item} className="inline-flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-700" />
+                  {item}
+                </span>
+              ))}
             </div>
+          </div>
 
-            <div className="w-full sm:w-auto p-4 rounded-2xl bg-neutral-50 border border-neutral-200 text-center shrink-0">
-              <FileText className="w-10 h-10 text-emerald-600 mx-auto mb-2" />
-              <p className="text-xs font-bold text-neutral-900">Format Resmi BPJS</p>
-              <p className="text-[10px] text-neutral-400">PDF Ready to Print</p>
-            </div>
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════
-          4. HOW IT WORKS: 4-STEP STREAMLINED JOURNEY (SCROLL REVEAL)
-      ══════════════════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden bg-neutral-950 text-white py-24 sm:py-32 border-y border-neutral-800">
-        {/* Dot Matrix Texture */}
-        <div className="absolute inset-0 bg-grid-dots-dark opacity-30 pointer-events-none" />
-
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={fadeInUp}
-            className="text-center max-w-2xl mx-auto mb-16 space-y-3"
-          >
-            <span className="text-xs font-bold uppercase tracking-widest text-primary-400 bg-primary-950 px-3 py-1 rounded-full border border-primary-800/80">
-              Prosedur Sederhana
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-              Alur Pendaftaran BPJS Pemerintah
-            </h2>
-            <p className="text-neutral-400 text-sm sm:text-base leading-relaxed">
-              Cukup 4 tahapan ringkas untuk mendaftarkan diri dan keluarga dalam jaminan
-              kesehatan nasional.
-            </p>
-          </motion.div>
-
-          {/* Stepper Cards with Scroll Stagger */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.15 }}
-            variants={staggerContainer}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-          >
-            {bentoSteps.map((item, i) => (
-              <motion.div
-                key={i}
-                variants={cardItem}
-                whileHover={{ y: -6, transition: { duration: 0.3, ease: EASE_AWWWARDS } }}
-                className="relative glass-dark rounded-3xl p-6 sm:p-7 flex flex-col justify-between border border-neutral-800 hover:border-primary-500/80 transition-all duration-300 group text-left cursor-default"
-              >
-                <div>
-                  {/* Big Number Typography */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-4xl sm:text-5xl font-black font-mono text-white/10 group-hover:text-primary-400/30 transition-colors">
-                      {item.step}
-                    </span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 px-2.5 py-1 rounded-md bg-white/5 border border-white/10">
-                      {item.tag}
-                    </span>
+          <Reveal className="relative mx-auto w-full max-w-[500px]">
+            <div className="absolute inset-5 rounded-[2rem] bg-emerald-200/70 blur-2xl" />
+            <div className="relative overflow-hidden rounded-[2rem] border border-white/80 bg-primary-950 p-6 text-white shadow-[0_30px_80px_-32px_rgba(4,63,63,0.5)] sm:p-8">
+              <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full border-[36px] border-white/[0.04]" />
+              <div className="absolute -bottom-28 -left-20 h-72 w-72 rounded-full bg-emerald-500/10 blur-2xl" />
+              <div className="relative">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={logoDinkes}
+                    alt="Logo Dinas Kesehatan Kota Dumai"
+                    className="h-12 w-12 rounded-full border border-white/30 bg-white object-cover p-0.5"
+                  />
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-200">
+                      Program prioritas
+                    </p>
+                    <p className="mt-0.5 text-sm font-bold text-white">
+                      Jaminan Kesehatan Dumai
+                    </p>
                   </div>
-
-                  <h3 className="text-lg font-bold text-white mb-2 group-hover:text-primary-300 transition-colors">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-neutral-400 leading-relaxed mb-4">
-                    {item.description}
-                  </p>
+                  <ShieldCheck className="ml-auto h-6 w-6 text-emerald-300" />
                 </div>
 
-                <div className="pt-3 border-t border-neutral-800/80 text-[11px] font-semibold text-emerald-400 flex items-center gap-1">
-                  <Check className="w-3.5 h-3.5" />
-                  <span>{item.highlight}</span>
+                <div className="my-8 border-t border-white/10" />
+
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
+                  Perlindungan kesehatan
+                </p>
+                <h2 className="mt-3 max-w-sm text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+                  Sehat lebih dekat, untuk seluruh keluarga.
+                </h2>
+                <p className="mt-3 max-w-sm text-sm leading-6 text-white/65">
+                  Satu portal untuk mengajukan, melengkapi data, dan memantau
+                  proses pendaftaran.
+                </p>
+
+                <div className="mt-7 grid grid-cols-2 gap-3">
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-4">
+                    <CreditCard className="h-5 w-5 text-emerald-300" />
+                    <p className="mt-3 text-xl font-bold">Rp 0</p>
+                    <p className="mt-0.5 text-[11px] text-white/60">
+                      Iuran program APBD
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-4">
+                    <UsersRound className="h-5 w-5 text-emerald-300" />
+                    <p className="mt-3 text-xl font-bold">Satu KK</p>
+                    <p className="mt-0.5 text-[11px] text-white/60">
+                      Data keluarga terpadu
+                    </p>
+                  </div>
                 </div>
-              </motion.div>
-            ))}
-          </motion.div>
+
+                <div className="mt-4 flex items-center gap-2 rounded-xl bg-emerald-400/10 px-3.5 py-3 text-xs font-medium text-emerald-100">
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-300" />
+                  Pengajuan tercatat dan dapat dipantau
+                </div>
+              </div>
+            </div>
+            <div className="absolute -bottom-5 left-4 hidden items-center gap-2.5 rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-xs font-semibold text-neutral-800 shadow-lg sm:flex">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+                <FileCheck2 className="h-4 w-4" />
+              </span>
+              Data aman, proses terarah
+            </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════
-          5. SECURITY & CONVENIENCE PILLARS (SCROLL REVEAL)
-      ══════════════════════════════════════════════════════════════ */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.25 }}
-          variants={fadeInUp}
-          className="glass-card rounded-3xl p-8 sm:p-12 border border-neutral-200/90 shadow-sm"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-neutral-200">
-            <div className="space-y-3 md:pr-6 text-left">
-              <div className="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center">
-                <Lock className="w-5 h-5" />
-              </div>
-              <h4 className="text-base font-bold text-neutral-900">
-                Keamanan Data Terjamin
-              </h4>
-              <p className="text-xs text-neutral-500 leading-relaxed">
-                Dokumen identitas Anda disimpan dengan proteksi Row Level Security dan
-                hanya dapat diakses oleh petugas verifikasi berwenang.
+      <section className="relative z-10 mx-auto -mt-7 grid max-w-6xl grid-cols-2 gap-3 px-4 sm:-mt-9 sm:grid-cols-4 sm:gap-4 sm:px-6">
+        {stats.map((item, index) => (
+          <Reveal key={item.label} delay={index * 0.04}>
+            <div className="h-full rounded-2xl border border-neutral-200/80 bg-white p-4 shadow-[0_8px_24px_-20px_rgba(15,23,42,0.35)] sm:p-5">
+              <p className={`text-2xl font-extrabold tracking-tight sm:text-3xl ${item.accent}`}>
+                {item.value}
+              </p>
+              <p className="mt-1 text-[11px] leading-4 text-neutral-500 sm:text-xs">
+                {item.label}
               </p>
             </div>
-
-            <div className="space-y-3 pt-6 md:pt-0 md:px-6 text-left">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <Building2 className="w-5 h-5" />
-              </div>
-              <h4 className="text-base font-bold text-neutral-900">
-                Faskes Tk. I Seluruh Indonesia
-              </h4>
-              <p className="text-xs text-neutral-500 leading-relaxed">
-                Bebas memilih Fasilitas Kesehatan Tingkat I (Puskesmas atau Klinik Pratama)
-                yang paling dekat dengan domisili tempat tinggal Anda.
-              </p>
-            </div>
-
-            <div className="space-y-3 pt-6 md:pt-0 md:pl-6 text-left">
-              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                <Smartphone className="w-5 h-5" />
-              </div>
-              <h4 className="text-base font-bold text-neutral-900">
-                100% Responsif &amp; Ringan
-              </h4>
-              <p className="text-xs text-neutral-500 leading-relaxed">
-                Akses portal dengan cepat dan nyaman melalui smartphone Android, iPhone,
-                tablet, maupun komputer desktop tanpa kendala.
-              </p>
-            </div>
-          </div>
-        </motion.div>
+          </Reveal>
+        ))}
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════
-          6. FINAL CALL TO ACTION (AWWWARDS HIGH-IMPACT CLOSER)
-      ══════════════════════════════════════════════════════════════ */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96, y: 40 }}
-          whileInView={{ opacity: 1, scale: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.8, ease: EASE_AWWWARDS }}
-          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-900 via-primary-800 to-neutral-950 p-8 sm:p-14 text-center text-white shadow-2xl border border-primary-700/50"
-        >
-          {/* Ambient Lighting Orbs */}
-          <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-emerald-400/20 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-accent-400/15 blur-3xl" />
+      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+        <SectionHeading
+          eyebrow="Program prioritas Pemko Dumai"
+          title="3 keunggulan BPJS Gratis Kota Dumai"
+          description="Layanan yang dirancang agar pengajuan lebih mudah dipahami, status lebih mudah dipantau, dan pilihan faskes lebih dekat dengan warga."
+        />
 
-          <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold backdrop-blur-md border border-white/20">
-              <Shield className="w-3.5 h-3.5 text-accent-300" />
-              Perlindungan Kesehatan Keluarga Anda
-            </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {advantages.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <Reveal key={item.title} delay={index * 0.06}>
+                <article className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-lg hover:shadow-primary-900/[0.06] sm:p-7">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary-100 text-primary-700">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="mt-5 text-lg font-bold tracking-tight text-neutral-900">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-neutral-600">
+                    {item.description}
+                  </p>
+                  <ul className="mt-5 space-y-2.5 border-t border-neutral-100 pt-4">
+                    {item.points.map((point) => (
+                      <li
+                        key={point}
+                        className="flex items-start gap-2 text-xs leading-5 text-neutral-600"
+                      >
+                        <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-700" />
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    to={item.to}
+                    className="mt-auto inline-flex items-center gap-1 pt-6 text-xs font-bold text-primary-700 no-underline hover:text-primary-900"
+                  >
+                    {item.action}
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </Link>
+                </article>
+              </Reveal>
+            );
+          })}
+        </div>
+      </section>
 
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
-              Siap Mendaftar BPJS Kesehatan Hari Ini?
-            </h2>
+      <section id="alur" className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <SectionHeading
+            eyebrow="Syarat & alur pendaftaran"
+            title="Hanya 3 langkah mudah"
+            description="Ikuti tahapannya dari menyiapkan data sampai memeriksa hasil verifikasi."
+          />
 
-            <p className="text-sm sm:text-base text-primary-100/90 leading-relaxed">
-              Daftar sekarang dalam beberapa menit. Lindungi masa depan kesehatan Anda
-              dan seluruh anggota keluarga dengan jaminan kesehatan nasional terpercaya.
+          <div className="grid gap-4 md:grid-cols-3">
+            {steps.map((step, index) => (
+              <Reveal key={step.number} delay={index * 0.06}>
+                <article className="relative h-full rounded-2xl bg-neutral-50 p-6 sm:p-7">
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ${
+                        index === 1 ? "bg-emerald-700" : "bg-primary-950"
+                      }`}
+                    >
+                      {step.number}
+                    </span>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-neutral-400">
+                      Langkah {index + 1}
+                    </span>
+                  </div>
+                  <h3 className="mt-6 text-lg font-bold leading-snug text-neutral-900">
+                    {step.title}
+                  </h3>
+                  <p className="mt-2 min-h-12 text-sm leading-6 text-neutral-600">
+                    {step.description}
+                  </p>
+                  <span className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-[11px] font-semibold text-emerald-800">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    {step.note}
+                  </span>
+                </article>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-20 sm:px-6 sm:py-24 lg:grid-cols-[0.8fr_1.2fr]">
+        <Reveal>
+          <div>
+            <p className="mb-3 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-primary-700">
+              <MapPin className="h-4 w-4" />
+              Jejaring pelayanan Kota Dumai
             </p>
+            <h2 className="text-3xl font-bold leading-tight tracking-tight text-neutral-900 sm:text-4xl">
+              Faskes tingkat pertama, lebih dekat dengan domisili.
+            </h2>
+            <p className="mt-4 text-sm leading-6 text-neutral-600 sm:text-base">
+              Pilih Puskesmas yang sesuai dengan wilayah tempat tinggal saat
+              mengisi formulir pendaftaran. Berikut beberapa contoh faskes di
+              Kota Dumai.
+            </p>
+            <Link
+              to={registrationPath}
+              className="mt-6 inline-flex h-11 items-center gap-2 rounded-xl bg-primary-800 px-5 text-sm font-semibold text-white no-underline transition-colors hover:bg-primary-700"
+            >
+                Pilih faskes saat daftar
+                <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </Reveal>
 
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
-              <Link to={user ? "/register" : "/login"} className="no-underline">
-                <Button
-                  size="lg"
-                  className="h-13 px-8 text-sm font-bold bg-white text-primary-800 hover:bg-neutral-100 shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] rounded-xl flex items-center gap-2 cursor-pointer"
-                >
-                  <FileText className="w-4 h-4 text-primary-700" />
-                  <span>Daftar Sekarang</span>
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {facilities.map((facility, index) => (
+            <Reveal key={facility.name} delay={index * 0.04}>
+              <article className="flex h-full min-h-28 items-center gap-4 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary-100 text-primary-700">
+                  <Building2 className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-primary-700">
+                    Faskes tingkat I
+                  </p>
+                  <h3 className="mt-1 text-sm font-bold text-neutral-900">
+                    {facility.name}
+                  </h3>
+                  <p className="mt-0.5 text-xs text-neutral-500">
+                    Kecamatan {facility.district}
+                  </p>
+                </div>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-[#f0f4f3] py-20 sm:py-24">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <SectionHeading
+            eyebrow="Komitmen Pemko Dumai"
+            title="Perlindungan yang terasa manfaatnya"
+            description="Informasi layanan, langkah pengajuan, dan tindak lanjut disajikan dalam satu tempat."
+          />
+          <div className="grid gap-x-8 gap-y-7 sm:grid-cols-2 lg:grid-cols-4">
+            {commitments.map((item, index) => {
+              const Icon = item.icon;
+              return (
+                <Reveal key={item.title} delay={index * 0.04}>
+                  <article className="h-full border-l-2 border-emerald-600 pl-4">
+                    <Icon className="h-5 w-5 text-primary-700" />
+                    <h3 className="mt-3 text-sm font-bold text-neutral-900">
+                      {item.title}
+                    </h3>
+                    <p className="mt-1.5 text-xs leading-5 text-neutral-600">
+                      {item.description}
+                    </p>
+                  </article>
+                </Reveal>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-4xl px-4 py-20 sm:px-6 sm:py-24">
+        <SectionHeading
+          eyebrow="Tanya jawab seputar BPJS Dumai"
+          title="Pertanyaan yang sering diajukan"
+          description="Temukan jawaban singkat tentang pengajuan dan cara memeriksa status."
+        />
+        <div className="space-y-3">
+          {questions.map((item) => (
+            <details
+              key={item.question}
+              className="group rounded-xl border border-neutral-200 bg-white px-5 shadow-sm open:border-primary-200"
+            >
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-sm font-semibold text-neutral-800 marker:content-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden">
+                {item.question}
+                <ChevronDown className="h-4 w-4 shrink-0 text-primary-700 transition-transform group-open:rotate-180" />
+              </summary>
+              <p className="max-w-3xl pb-5 pr-8 text-sm leading-6 text-neutral-600">
+                {item.answer}
+              </p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section className="px-4 pb-16 sm:px-6 sm:pb-20">
+        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-primary-950 px-6 py-12 text-white shadow-xl sm:px-10 sm:py-14 lg:px-14">
+          <div className="pointer-events-none absolute -right-20 -top-24 h-80 w-80 rounded-full border-[48px] border-white/[0.035]" />
+          <div className="pointer-events-none absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl" />
+          <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-emerald-200">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Program jaminan kesehatan Kota Dumai
+              </p>
+              <h2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+                Siap mengajukan pendaftaran?
+              </h2>
+              <p className="mt-3 max-w-xl text-sm leading-6 text-white/65 sm:text-base">
+                Siapkan data keluarga dan mulai pengajuan melalui portal
+                pendaftaran BPJS Kesehatan Kota Dumai.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link to={registrationPath} className="no-underline">
+                <span className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-5 text-sm font-bold text-primary-950 transition-colors hover:bg-emerald-300 sm:w-auto">
+                  Daftar sekarang
+                  <ArrowRight className="h-4 w-4" />
+                </span>
               </Link>
-
-              <Link to="/cek-status" className="no-underline">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="h-13 px-7 text-sm font-semibold bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white backdrop-blur-md rounded-xl transition-all cursor-pointer"
-                >
-                  <Search className="w-4 h-4" />
-                  <span>Cek Status</span>
-                </Button>
+              <Link
+                to="/cek-status"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-white/20 px-5 text-sm font-semibold text-white no-underline transition-colors hover:bg-white/10"
+              >
+                <Search className="h-4 w-4" />
+                Cek status
               </Link>
             </div>
           </div>
-        </motion.div>
+        </div>
       </section>
     </div>
   );

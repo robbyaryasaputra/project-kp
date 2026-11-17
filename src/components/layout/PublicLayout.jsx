@@ -9,7 +9,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import logoDinkes from "@/assets/logo-dinkes.jpg";
@@ -18,6 +18,7 @@ export default function PublicLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, loading, signOut } = useAuth();
+  const reduceMotion = useReducedMotion();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Instantly reset scroll to top on page switch & auto-close mobile menu
@@ -48,16 +49,26 @@ export default function PublicLayout() {
       <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none h-[2.5px] overflow-hidden">
         <motion.div
           key={location.pathname}
-          initial={{ width: "0%", opacity: 1 }}
-          animate={{
-            width: ["0%", "35%", "85%", "100%"],
-            opacity: [1, 1, 1, 0],
-          }}
-          transition={{
-            duration: 0.45,
-            times: [0, 0.25, 0.65, 1],
-            ease: [0.16, 1, 0.3, 1],
-          }}
+          initial={
+            reduceMotion ? { width: "100%", opacity: 0 } : { width: "0%", opacity: 1 }
+          }
+          animate={
+            reduceMotion
+              ? { width: "100%", opacity: 0 }
+              : {
+                  width: ["0%", "35%", "85%", "100%"],
+                  opacity: [1, 1, 1, 0],
+                }
+          }
+          transition={
+            reduceMotion
+              ? { duration: 0 }
+              : {
+                  duration: 0.45,
+                  times: [0, 0.25, 0.65, 1],
+                  ease: [0.16, 1, 0.3, 1],
+                }
+          }
           className="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.9)] relative"
         >
           <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-r from-transparent to-white/70 blur-xs" />
@@ -65,7 +76,7 @@ export default function PublicLayout() {
       </div>
 
       {/* ── Modern Minimalist Header ── */}
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-neutral-200/70 transition-all duration-300">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-primary-900 text-white shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             {/* Logo / Brand */}
@@ -73,7 +84,7 @@ export default function PublicLayout() {
               to="/"
               className="flex items-center gap-3 no-underline group cursor-pointer"
             >
-              <div className="w-9 h-9 rounded-full overflow-hidden bg-white shadow-xs ring-1 ring-neutral-200/90 group-hover:ring-emerald-500/50 group-hover:scale-105 transition-all duration-200 shrink-0 flex items-center justify-center">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white p-0.5 shadow-sm transition-transform duration-200 group-hover:scale-105">
                 <img
                   src={logoDinkes}
                   alt="Logo Dinas Kesehatan Kota Dumai"
@@ -81,20 +92,16 @@ export default function PublicLayout() {
                 />
               </div>
               <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm sm:text-base font-bold text-neutral-900 tracking-tight leading-tight group-hover:text-emerald-700 transition-colors">
-                    DINKES KOTA DUMAI
-                  </span>
-                  
-                </div>
-                <p className="text-[11px] text-neutral-500 leading-tight hidden sm:block font-normal mt-0.5">
-                  Layanan Pendaftaran
+                <span className="text-sm font-bold leading-tight tracking-tight text-white transition-colors group-hover:text-emerald-200 sm:text-base">
+                  DINKES KOTA DUMAI
+                </span>
+                <p className="mt-0.5 hidden text-[10px] leading-tight text-white/60 sm:block">
+                  Program UHC &amp; PBI APBD Kota Dumai
                 </p>
               </div>
             </Link>
 
-            {/* Desktop Navigation Dock (Centered Minimal Pill with Gliding Indicator) */}
-            <nav className="hidden md:flex items-center gap-1 p-1 bg-neutral-100/80 border border-neutral-200/70 rounded-full shadow-inner-xs relative">
+            <nav className="relative hidden items-center gap-1 rounded-full border border-white/10 bg-white/[0.07] p-1 md:flex">
               {navLinks.map((link) => {
                 const Icon = link.icon;
                 const isActive = location.pathname === link.to;
@@ -102,26 +109,30 @@ export default function PublicLayout() {
                   <Link
                     key={link.to}
                     to={link.to}
-                    className={`relative flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors duration-200 no-underline z-10 ${
+                    className={`relative z-10 flex items-center gap-2 rounded-full px-3.5 py-2 text-xs no-underline transition-colors duration-200 ${
                       isActive
-                        ? "text-neutral-900 font-semibold"
-                        : "text-neutral-600 hover:text-neutral-900"
+                        ? "font-semibold text-primary-950"
+                        : "font-medium text-white/70 hover:text-white"
                     }`}
                   >
                     {isActive && (
                       <motion.div
                         layoutId="publicNavActivePill"
-                        className="absolute inset-0 bg-white rounded-full shadow-xs border border-neutral-200/80 -z-10"
-                        transition={{
-                          type: "spring",
-                          stiffness: 400,
-                          damping: 30,
-                        }}
+                        className="absolute inset-0 -z-10 rounded-full border border-white/80 bg-white shadow-sm"
+                        transition={
+                          reduceMotion
+                            ? { duration: 0 }
+                            : {
+                                type: "spring",
+                                stiffness: 400,
+                                damping: 30,
+                              }
+                        }
                       />
                     )}
                     <Icon
-                      className={`w-3.5 h-3.5 transition-colors duration-200 ${
-                        isActive ? "text-emerald-600" : "text-neutral-400"
+                      className={`h-3.5 w-3.5 transition-colors duration-200 ${
+                        isActive ? "text-emerald-700" : "text-white/50"
                       }`}
                     />
                     <span>{link.label}</span>
@@ -135,29 +146,36 @@ export default function PublicLayout() {
               {!loading && (
                 <>
                   {user ? (
-                    <div className="flex items-center gap-1.5 p-1 pl-2 bg-neutral-100/90 border border-neutral-200/80 rounded-full shadow-inner-xs">
-                      <div className="w-6 h-6 rounded-full bg-emerald-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0 shadow-xs">
+                    <div className="hidden items-center gap-1.5 rounded-full border border-white/15 bg-white/10 p-1 pl-2 sm:flex">
+                      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-400 text-[10px] font-bold text-primary-950">
                         {userInitial}
                       </div>
-                      <span className="text-xs font-medium text-neutral-700 max-w-[90px] sm:max-w-[120px] truncate leading-none">
+                      <span className="max-w-[120px] truncate text-xs font-medium leading-none text-white/90">
                         {displayName}
                       </span>
                       <button
                         onClick={handleSignOut}
                         title="Keluar"
-                        className="w-6 h-6 rounded-full flex items-center justify-center text-neutral-400 hover:text-red-500 hover:bg-white transition-colors cursor-pointer"
+                        className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full text-white/60 transition-colors hover:bg-white/10 hover:text-white"
                       >
                         <LogOut className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ) : (
-                    <Link to="/login" className="no-underline">
-                      <button className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white text-xs font-medium transition-all duration-200 shadow-xs cursor-pointer">
-                        <LogIn className="w-3.5 h-3.5" />
-                        <span>Masuk</span>
-                      </button>
+                    <Link
+                      to="/login"
+                      className="hidden rounded-full px-3 py-2 text-xs font-semibold text-white/75 no-underline transition-colors hover:text-white sm:inline-flex"
+                    >
+                      Masuk
                     </Link>
                   )}
+                  <Link
+                    to={user ? "/register" : "/login"}
+                    className="hidden items-center gap-1.5 rounded-full bg-emerald-400 px-4 py-2 text-xs font-bold text-primary-950 no-underline shadow-sm transition-colors hover:bg-emerald-300 sm:inline-flex"
+                  >
+                    <FileText className="h-3.5 w-3.5" />
+                    Daftar Gratis
+                  </Link>
                 </>
               )}
 
@@ -165,8 +183,10 @@ export default function PublicLayout() {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 rounded-xl text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors cursor-pointer"
+                className="cursor-pointer rounded-xl p-2 text-white/75 transition-colors hover:bg-white/10 hover:text-white md:hidden"
                 aria-label="Toggle navigation menu"
+                aria-expanded={mobileMenuOpen}
+                aria-controls="public-mobile-menu"
               >
                 {mobileMenuOpen ? (
                   <X className="w-5 h-5" />
@@ -182,11 +202,12 @@ export default function PublicLayout() {
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -8 }}
+              id="public-mobile-menu"
+              initial={reduceMotion ? false : { opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.18, ease: "easeOut" }}
-              className="md:hidden border-b border-neutral-200/80 bg-white/95 backdrop-blur-xl px-4 py-3 space-y-3 shadow-lg"
+              exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
+              transition={reduceMotion ? { duration: 0 } : { duration: 0.18, ease: "easeOut" }}
+              className="space-y-3 border-b border-white/10 bg-primary-900 px-4 py-3 shadow-lg md:hidden"
             >
               <div className="space-y-1">
                 {navLinks.map((link) => {
@@ -197,15 +218,15 @@ export default function PublicLayout() {
                       key={link.to}
                       to={link.to}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors no-underline ${
+                      className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm no-underline transition-colors ${
                         isActive
-                          ? "bg-emerald-50 text-emerald-800 font-semibold"
-                          : "text-neutral-600 hover:bg-neutral-100/70 hover:text-neutral-900"
+                          ? "bg-white/10 font-semibold text-white"
+                          : "font-medium text-white/70 hover:bg-white/5 hover:text-white"
                       }`}
                     >
                       <Icon
                         className={`w-4 h-4 ${
-                          isActive ? "text-emerald-600" : "text-neutral-400"
+                          isActive ? "text-emerald-300" : "text-white/45"
                         }`}
                       />
                       <span>{link.label}</span>
@@ -215,18 +236,18 @@ export default function PublicLayout() {
               </div>
 
               {/* Mobile Auth info / Action */}
-              <div className="pt-2 border-t border-neutral-100">
+              <div className="border-t border-white/10 pt-3">
                 {user ? (
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-50 border border-neutral-200/70">
+                  <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-2.5">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-7 h-7 rounded-full bg-emerald-600 text-white text-xs font-bold flex items-center justify-center shrink-0">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-400 text-xs font-bold text-primary-950">
                         {userInitial}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-semibold text-neutral-800 truncate">
+                        <p className="truncate text-xs font-semibold text-white">
                           {displayName}
                         </p>
-                        <p className="text-[10px] text-neutral-500 font-mono truncate">
+                        <p className="truncate font-mono text-[10px] text-white/50">
                           {user.email}
                         </p>
                       </div>
@@ -236,7 +257,7 @@ export default function PublicLayout() {
                         setMobileMenuOpen(false);
                         handleSignOut();
                       }}
-                      className="flex items-center gap-1 text-xs text-red-600 hover:text-red-700 font-medium px-2.5 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                      className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-red-300 transition-colors hover:bg-red-400/10 hover:text-red-200"
                     >
                       <LogOut className="w-3.5 h-3.5" />
                       <span>Keluar</span>
@@ -246,10 +267,10 @@ export default function PublicLayout() {
                   <Link
                     to="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-neutral-900 text-white text-sm font-medium hover:bg-neutral-800 active:scale-98 transition-all no-underline"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 py-2.5 text-sm font-bold text-primary-950 no-underline transition-colors hover:bg-emerald-300"
                   >
                     <LogIn className="w-4 h-4" />
-                    <span>Masuk / Daftar Akun</span>
+                    <span>Daftar Gratis / Masuk</span>
                   </Link>
                 )}
               </div>
@@ -262,37 +283,73 @@ export default function PublicLayout() {
       <main className="min-w-0 flex-1">
         <motion.div
           key={location.pathname}
-          initial={{ opacity: 0 }}
+          initial={reduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.18, ease: "easeOut" }}
+          transition={reduceMotion ? { duration: 0 } : { duration: 0.18, ease: "easeOut" }}
         >
           <Outlet />
         </motion.div>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-neutral-200/80 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full overflow-hidden shrink-0 border border-neutral-200">
+      <footer className="border-t border-white/10 bg-primary-950 text-white">
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.4fr_0.8fr_0.8fr]">
+            <div>
+              <Link to="/" className="inline-flex items-center gap-3 no-underline">
                 <img
                   src={logoDinkes}
-                  alt="Logo Kota Dumai"
-                  className="w-full h-full object-cover"
+                  alt="Logo Dinas Kesehatan Kota Dumai"
+                  className="h-10 w-10 rounded-full border border-white/20 bg-white p-0.5"
                 />
-              </div>
-              <span>
-                © 2026 Dinas Kesehatan Kota Dumai · Layanan Pendaftaran BPJS Pemerintah Kota Dumai
-              </span>
+                <span className="text-sm font-bold text-white">
+                  Dinas Kesehatan Kota Dumai
+                </span>
+              </Link>
+              <p className="mt-4 max-w-md text-xs leading-5 text-white/60">
+                Portal pendaftaran dan pemantauan layanan BPJS Kesehatan
+                Pemerintah Kota Dumai.
+              </p>
             </div>
-            <Link
-              to="/admin/login"
-              className="text-neutral-400 hover:text-neutral-700 transition-colors no-underline flex items-center gap-1 font-mono text-[11px]"
-            >
-              <span>Panel Petugas</span>
-              <span>→</span>
-            </Link>
+
+            <div>
+              <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-white/90">
+                Layanan
+              </h2>
+              <div className="mt-3 flex flex-col items-start gap-2.5 text-xs text-white/60">
+                <Link to="/register" className="no-underline transition-colors hover:text-emerald-300">
+                  Daftar BPJS
+                </Link>
+                <Link to="/cek-status" className="no-underline transition-colors hover:text-emerald-300">
+                  Cek status
+                </Link>
+                <Link to="/login" className="no-underline transition-colors hover:text-emerald-300">
+                  Masuk akun
+                </Link>
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-white/90">
+                Informasi
+              </h2>
+              <p className="mt-3 text-xs leading-5 text-white/60">
+                Program jaminan kesehatan untuk warga Kota Dumai. Pastikan data
+                yang dikirim sesuai dokumen kependudukan.
+              </p>
+              <Link
+                to="/admin/login"
+                className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-emerald-300 no-underline transition-colors hover:text-emerald-200"
+              >
+                Panel petugas
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </div>
+
+          <div className="mt-8 flex flex-col gap-2 border-t border-white/10 pt-5 text-[11px] text-white/45 sm:flex-row sm:items-center sm:justify-between">
+            <span>© 2026 Dinas Kesehatan Kota Dumai</span>
+            <span>Layanan Pendaftaran BPJS Pemerintah Kota Dumai</span>
           </div>
         </div>
       </footer>
