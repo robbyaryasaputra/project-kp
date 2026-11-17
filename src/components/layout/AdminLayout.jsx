@@ -95,7 +95,7 @@ export default function AdminLayout() {
   const currentNav = navLinks.find((l) => l.to === location.pathname);
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex text-neutral-800">
+    <div className="min-h-screen bg-neutral-50 flex text-neutral-800 lg:h-screen lg:min-h-0 lg:overflow-hidden">
       {/* ── Mobile Overlay ── */}
       {sidebarOpen && (
         <div
@@ -106,7 +106,7 @@ export default function AdminLayout() {
 
       {/* ── Minimalist Sidebar ── */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-neutral-900 text-white flex flex-col border-r border-neutral-800 transform transition-transform duration-200 lg:translate-x-0 lg:static lg:inset-auto ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-neutral-900 text-white flex flex-col border-r border-neutral-800 transform transition-transform duration-200 lg:translate-x-0 lg:static lg:inset-auto lg:h-screen lg:shrink-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
       >
         {/* Header / Logo */}
@@ -202,9 +202,9 @@ export default function AdminLayout() {
       </aside>
 
       {/* ── Main Layout ── */}
-      <div className="flex-1 flex flex-col min-h-screen min-w-0">
+      <div className="flex-1 flex flex-col min-h-screen min-w-0 lg:h-screen lg:min-h-0">
         {/* Simple Clean Topbar */}
-        <header className="sticky top-0 z-30 bg-white border-b border-neutral-200 h-16 px-4 sm:px-6 flex items-center justify-between">
+        <header className="sticky top-0 z-30 bg-white border-b border-neutral-200 h-16 shrink-0 px-4 sm:px-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -227,7 +227,7 @@ export default function AdminLayout() {
         </header>
 
         {/* Content Outlet */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-6xl w-full mx-auto">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-6xl w-full mx-auto lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain">
           <Outlet />
         </main>
       </div>
