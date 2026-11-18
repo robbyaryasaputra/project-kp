@@ -125,7 +125,7 @@ export default function VerifyDetail() {
 
   const getGenderLabel = (g) => (g === 1 ? "Laki-laki" : "Perempuan");
   const getMaritalLabel = (m) =>
-    ({ 0: "Tidak Diketahui", 1: "Belum Kawin", 2: "Kawin", 3: "Cerai" }[m] ||
+  ({ 0: "Tidak Diketahui", 1: "Belum Kawin", 2: "Kawin", 3: "Cerai" }[m] ||
     "-");
   const getPisatLabel = (p) =>
     ({ 1: "Peserta", 2: "Suami", 3: "Istri", 4: "Anak" }[p] || "-");
@@ -405,11 +405,10 @@ export default function VerifyDetail() {
                           key={opt}
                           type="button"
                           onClick={() => setStatusNote(opt)}
-                          className={`text-[11px] px-2 py-0.5 rounded border transition-colors ${
-                            statusNote === opt
+                          className={`text-[11px] px-2 py-0.5 rounded border transition-colors ${statusNote === opt
                               ? "bg-emerald-600 text-white border-emerald-600 font-medium"
                               : "bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-100"
-                          }`}
+                            }`}
                         >
                           {opt}
                         </button>
@@ -477,6 +476,7 @@ export default function VerifyDetail() {
                     {processing ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
+
                       <XCircle className="w-4 h-4" />
                     )}
                     Konfirmasi Tolak

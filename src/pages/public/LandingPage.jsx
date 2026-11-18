@@ -20,6 +20,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import logoDinkes from "@/assets/logo-dinkes.jpg";
+import heroFamily from "@/assets/hero-family.jpg";
 import { useAuth } from "@/context/AuthContext";
 
 const EASE = [0.16, 1, 0.3, 1];
@@ -243,71 +244,81 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <Reveal className="relative mx-auto w-full max-w-[500px]">
-            <div className="absolute inset-5 rounded-[2rem] bg-emerald-200/70 blur-2xl" />
-            <div className="relative overflow-hidden rounded-[2rem] border border-white/80 bg-primary-950 p-6 text-white shadow-[0_30px_80px_-32px_rgba(4,63,63,0.5)] sm:p-8">
-              <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full border-[36px] border-white/[0.04]" />
-              <div className="absolute -bottom-28 -left-20 h-72 w-72 rounded-full bg-emerald-500/10 blur-2xl" />
-              <div className="relative">
-                <div className="flex items-center gap-3">
+          <Reveal className="relative mx-auto w-full max-w-[540px]">
+            {/* Ambient Background Glow */}
+            <div className="pointer-events-none absolute inset-4 rounded-[2.5rem] bg-gradient-to-tr from-emerald-400/25 via-primary-300/20 to-teal-200/20 blur-2xl" />
+
+            {/* Main Editorial Image Card */}
+            <div className="group relative overflow-hidden rounded-[2rem] border border-neutral-200/80 bg-white p-2 shadow-[0_30px_70px_-25px_rgba(4,63,63,0.22)] transition-all duration-500 hover:shadow-[0_35px_80px_-20px_rgba(4,63,63,0.3)]">
+              {/* Image Container with Ambient Scrim */}
+              <div className="relative aspect-[4/3.2] w-full overflow-hidden rounded-[1.6rem] bg-neutral-100 sm:aspect-[4/3.3]">
+                <img
+                  src={heroFamily}
+                  alt="Keluarga warga Kota Dumai di Puskesmas Ramah Keluarga"
+                  className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                />
+
+                {/* Editorial Gradient Scrim for readable badges and text */}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-neutral-950/85 via-neutral-950/25 to-neutral-950/10" />
+
+                {/* Top Badge: Floating Status Pill */}
+                <div className="absolute left-3.5 top-3.5 sm:left-4 sm:top-4 inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/90 px-3 py-1.5 text-[11px] font-bold text-neutral-800 shadow-md backdrop-blur-md">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                  </span>
+                  Layanan Faskes Ramah Keluarga
+                </div>
+
+                {/* Top Right: Dinas Kesehatan Seal Pill */}
+                <div className="absolute right-3.5 top-3.5 sm:right-4 sm:top-4 flex items-center gap-2 rounded-full border border-white/20 bg-neutral-900/70 p-1 pl-2.5 text-[10px] font-semibold tracking-wider text-white shadow-md backdrop-blur-md">
+                  <span className="hidden xs:inline uppercase">Kota Dumai</span>
                   <img
                     src={logoDinkes}
                     alt="Logo Dinas Kesehatan Kota Dumai"
-                    className="h-12 w-12 rounded-full border border-white/30 bg-white object-cover p-0.5"
+                    className="h-6 w-6 rounded-full border border-white/30 object-cover"
                   />
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-200">
-                      Program prioritas
-                    </p>
-                    <p className="mt-0.5 text-sm font-bold text-white">
-                      Jaminan Kesehatan Dumai
-                    </p>
-                  </div>
-                  <ShieldCheck className="ml-auto h-6 w-6 text-emerald-300" />
                 </div>
 
-                <div className="my-8 border-t border-white/10" />
+                {/* Bottom Overlay Text */}
+                <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 text-white">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-300">
+                    Jaminan Kesehatan Semesta (UHC)
+                  </p>
+                  <h3 className="mt-1 text-lg font-bold leading-snug sm:text-xl text-white">
+                    Perlindungan kesehatan aktif untuk seluruh anggota keluarga.
+                  </h3>
+                  <p className="mt-1 hidden sm:block text-xs leading-relaxed text-white/80">
+                    Terhubung langsung dengan fasilitas kesehatan tingkat pertama di 7 kecamatan Kota Dumai.
+                  </p>
+                </div>
+              </div>
 
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
-                  Perlindungan kesehatan
-                </p>
-                <h2 className="mt-3 max-w-sm text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
-                  Sehat lebih dekat, untuk seluruh keluarga.
-                </h2>
-                <p className="mt-3 max-w-sm text-sm leading-6 text-white/65">
-                  Satu portal untuk mengajukan, melengkapi data, dan memantau
-                  proses pendaftaran.
-                </p>
-
-                <div className="mt-7 grid grid-cols-2 gap-3">
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-4">
-                    <CreditCard className="h-5 w-5 text-emerald-300" />
-                    <p className="mt-3 text-xl font-bold">Rp 0</p>
-                    <p className="mt-0.5 text-[11px] text-white/60">
-                      Iuran program APBD
-                    </p>
+              {/* Bottom Micro Metric Bar */}
+              <div className="grid grid-cols-2 gap-2 p-2 pt-3">
+                <div className="flex items-center gap-2.5 rounded-xl border border-neutral-100 bg-neutral-50/80 p-2.5 sm:p-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                    <CreditCard className="h-4 w-4" />
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-4">
-                    <UsersRound className="h-5 w-5 text-emerald-300" />
-                    <p className="mt-3 text-xl font-bold">Satu KK</p>
-                    <p className="mt-0.5 text-[11px] text-white/60">
-                      Data keluarga terpadu
-                    </p>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-neutral-900 leading-tight">Rp 0 Bebas Iuran</p>
+                    <p className="text-[10px] text-neutral-500 leading-tight truncate">Ditanggung APBD</p>
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-center gap-2 rounded-xl bg-emerald-400/10 px-3.5 py-3 text-xs font-medium text-emerald-100">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-300" />
-                  Pengajuan tercatat dan dapat dipantau
+                <div className="flex items-center gap-2.5 rounded-xl border border-neutral-100 bg-neutral-50/80 p-2.5 sm:p-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-100 text-primary-800">
+                    <UsersRound className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-neutral-900 leading-tight">1 Akun = 1 KK</p>
+                    <p className="text-[10px] text-neutral-500 leading-tight truncate">Daftarkan sekeluarga</p>
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="absolute -bottom-5 left-4 hidden items-center gap-2.5 rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-xs font-semibold text-neutral-800 shadow-lg sm:flex">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
-                <FileCheck2 className="h-4 w-4" />
-              </span>
-              Data aman, proses terarah
-            </div>
+
+
           </Reveal>
         </div>
       </section>
@@ -388,9 +399,8 @@ export default function LandingPage() {
                 <article className="relative h-full rounded-2xl bg-neutral-50 p-6 sm:p-7">
                   <div className="flex items-center justify-between">
                     <span
-                      className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ${
-                        index === 1 ? "bg-emerald-700" : "bg-primary-950"
-                      }`}
+                      className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ${index === 1 ? "bg-emerald-700" : "bg-primary-950"
+                        }`}
                     >
                       {step.number}
                     </span>
@@ -434,8 +444,8 @@ export default function LandingPage() {
               to={registrationPath}
               className="mt-6 inline-flex h-11 items-center gap-2 rounded-xl bg-primary-800 px-5 text-sm font-semibold text-white no-underline transition-colors hover:bg-primary-700"
             >
-                Pilih faskes saat daftar
-                <ArrowRight className="h-4 w-4" />
+              Pilih faskes saat daftar
+              <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </Reveal>
