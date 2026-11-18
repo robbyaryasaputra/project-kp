@@ -212,7 +212,33 @@ export default function LandingPage() {
 
   return (
     <div className="overflow-hidden bg-neutral-50 text-neutral-900">
-      <section className="relative isolate overflow-hidden bg-gradient-to-br from-secondary-50 via-neutral-50 to-white">
+      {/* ── Hero Banner dengan Moving Background (Puskesmas Kota Dumai / Morning Teal Gradient) ── */}
+      <section className="relative isolate overflow-hidden">
+        {/* Animated Moving Background — Ken Burns Cinematic Drift */}
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <motion.div
+            animate={
+              reduceMotion
+                ? undefined
+                : {
+                    scale: [1, 1.06, 1.03, 1],
+                    x: ["0%", "-1.5%", "1%", "0%"],
+                    y: ["0%", "1%", "-0.5%", "0%"],
+                  }
+            }
+            transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -inset-14 bg-cover bg-center"
+            style={{ backgroundImage: `url(${faskesBg})` }}
+          />
+
+          {/* Fresh Morning Teal-Cream Scrim — light & airy */}
+          <div className="absolute inset-0 bg-gradient-to-br from-secondary-50/96 via-[#edf9f7]/92 to-white/95 backdrop-blur-[3px]" />
+
+          {/* Subtle Ambient Dot Texture */}
+          <div className="absolute inset-0 bg-[radial-gradient(#0d6e6e_0.6px,transparent_1px)] [background-size:28px_28px] opacity-[0.08]" />
+        </div>
+
+        {/* Decorative orbs (kept from original) */}
         <div className="pointer-events-none absolute -left-36 top-12 h-80 w-80 rounded-full bg-emerald-100/70 blur-3xl" />
         <div className="pointer-events-none absolute -right-36 bottom-0 h-96 w-96 rounded-full bg-primary-100/60 blur-3xl" />
 
@@ -338,21 +364,22 @@ export default function LandingPage() {
 
           </Reveal>
         </div>
-      </section>
 
-      <section className="relative z-10 mx-auto -mt-7 grid max-w-6xl grid-cols-2 gap-3 px-4 sm:-mt-9 sm:grid-cols-4 sm:gap-4 sm:px-6">
-        {stats.map((item, index) => (
-          <Reveal key={item.label} delay={index * 0.04}>
-            <div className="h-full rounded-2xl border border-neutral-200/80 bg-white p-4 shadow-[0_8px_24px_-20px_rgba(15,23,42,0.35)] sm:p-5">
-              <p className={`text-2xl font-extrabold tracking-tight sm:text-3xl ${item.accent}`}>
-                {item.value}
-              </p>
-              <p className="mt-1 text-[11px] leading-4 text-neutral-500 sm:text-xs">
-                {item.label}
-              </p>
-            </div>
-          </Reveal>
-        ))}
+        {/* Stats cards — INSIDE hero section so background continues behind them */}
+        <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-2 gap-3 px-4 pb-10 sm:grid-cols-4 sm:gap-4 sm:px-6 sm:pb-14">
+          {stats.map((item, index) => (
+            <Reveal key={item.label} delay={index * 0.04}>
+              <div className="h-full rounded-2xl border border-white/60 bg-white/85 p-4 shadow-[0_8px_24px_-20px_rgba(15,23,42,0.35)] backdrop-blur-md sm:p-5">
+                <p className={`text-2xl font-extrabold tracking-tight sm:text-3xl ${item.accent}`}>
+                  {item.value}
+                </p>
+                <p className="mt-1 text-[11px] leading-4 text-neutral-500 sm:text-xs">
+                  {item.label}
+                </p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
       </section>
 
       {/* ── 3 Keunggulan BPJS Dumai dengan Background Gambar Bergerak (Ken Burns Drift) ── */}
@@ -663,64 +690,102 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-4xl px-4 py-20 sm:px-6 sm:py-24">
-        <SectionHeading
-          eyebrow="Tanya jawab seputar BPJS Dumai"
-          title="Pertanyaan yang sering diajukan"
-          description="Temukan jawaban singkat tentang pengajuan dan cara memeriksa status."
-        />
-        <div className="space-y-3">
-          {questions.map((item) => (
-            <details
-              key={item.question}
-              className="group rounded-xl border border-neutral-200 bg-white px-5 shadow-sm open:border-primary-200"
-            >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-sm font-semibold text-neutral-800 marker:content-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden">
-                {item.question}
-                <ChevronDown className="h-4 w-4 shrink-0 text-primary-700 transition-transform group-open:rotate-180" />
-              </summary>
-              <p className="max-w-3xl pb-5 pr-8 text-sm leading-6 text-neutral-600">
-                {item.answer}
-              </p>
-            </details>
-          ))}
-        </div>
-      </section>
+      {/* ── FAQ + CTA Bantuan — Gabung Satu Background Bergerak (Dumai Twilight Waterfront) ── */}
+      <section className="relative isolate overflow-hidden border-t border-white/10 bg-[#021d1b] pb-16 pt-20 sm:pb-24 sm:pt-28">
+        {/* Animated Moving Background — Ken Burns Cinematic Drift */}
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <motion.div
+            animate={
+              reduceMotion
+                ? undefined
+                : {
+                    scale: [1, 1.08, 1.04, 1],
+                    x: ["0%", "-2%", "1.5%", "0%"],
+                    y: ["0%", "1.5%", "-1%", "0%"],
+                  }
+            }
+            transition={{ duration: 32, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -inset-14 bg-cover bg-center"
+            style={{ backgroundImage: `url(${komitmenBg})` }}
+          />
 
-      <section className="px-4 pb-16 sm:px-6 sm:pb-20">
-        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-primary-950 via-[#033830] to-[#02241e] px-6 py-12 text-white shadow-2xl sm:px-10 sm:py-14 lg:px-14">
-          <div className="pointer-events-none absolute -right-20 -top-24 h-80 w-80 rounded-full border-[48px] border-white/[0.035]" />
-          <div className="pointer-events-none absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-emerald-500/15 blur-3xl" />
-          <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-2xl">
-              <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-emerald-200 backdrop-blur-sm">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                Layanan Bantuan &amp; Posko Pengaduan Dumai
-              </p>
-              <h2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
-                Butuh Bantuan Pendaftaran BPJS Dumai?
-              </h2>
-              <p className="mt-3 max-w-xl text-sm leading-6 text-white/70 sm:text-base">
-                Hubungi petugas Posko Layanan BPJS Kesehatan Kota Dumai melalui WhatsApp atau layanan Call Center tanggap cepat.
-              </p>
-            </div>
-            <div className="flex flex-col gap-3.5 w-full sm:w-auto">
-              <a
-                href="https://wa.me/6281275000000?text=Halo%20Admin%20Posko%20BPJS%20Dinas%20Kesehatan%20Kota%20Dumai,%20saya%20ingin%20bertanya%20seputar%20pendaftaran"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-[52px] w-full items-center justify-center gap-3 rounded-full bg-[#4ee4a5] px-7 text-[15px] font-bold tracking-tight text-[#063328] shadow-lg shadow-emerald-950/20 no-underline transition-all duration-200 hover:bg-[#42d997] hover:scale-[1.02] active:scale-95 sm:min-w-[320px]"
+          {/* Deep Twilight Teal-Indigo Scrim */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#011614]/94 via-[#022b25]/88 to-[#01110e]/95 backdrop-blur-[3px]" />
+
+          {/* Fine Emerald Dot Texture */}
+          <div className="absolute inset-0 bg-[radial-gradient(#34d399_0.6px,transparent_1px)] [background-size:22px_22px] opacity-[0.08]" />
+        </div>
+
+        {/* ─── FAQ Area ─── */}
+        <div className="relative mx-auto max-w-4xl px-4 sm:px-6">
+          <SectionHeading
+            dark
+            eyebrow="Tanya jawab seputar BPJS Dumai"
+            title="Pertanyaan yang sering diajukan"
+            description="Temukan jawaban singkat tentang pengajuan dan cara memeriksa status."
+          />
+          <div className="space-y-3">
+            {questions.map((item) => (
+              <details
+                key={item.question}
+                className="group rounded-2xl border border-white/10 bg-white/[0.06] px-5 shadow-[0_8px_24px_-10px_rgba(0,0,0,0.4)] backdrop-blur-xl transition-all duration-200 open:border-emerald-400/30 open:bg-white/[0.10]"
               >
-                <MessageSquareText className="h-[21px] w-[21px] stroke-[2.2] text-[#063328]" />
-                <span>WhatsApp Posko Dumai</span>
-              </a>
-              <a
-                href="tel:076531000"
-                className="inline-flex h-[52px] w-full items-center justify-center gap-3 rounded-full border border-white/20 bg-white/[0.08] px-7 text-[15px] font-bold tracking-tight text-white backdrop-blur-md no-underline transition-all duration-200 hover:border-white/40 hover:bg-white/[0.14] hover:scale-[1.02] active:scale-95 sm:min-w-[320px]"
-              >
-                <Phone className="h-[20px] w-[20px] stroke-[2.2] text-[#4ee4a5]" />
-                <span>Call Center: (0765) 31000 / 112</span>
-              </a>
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-sm font-semibold text-white marker:content-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent [&::-webkit-details-marker]:hidden">
+                  {item.question}
+                  <ChevronDown className="h-4 w-4 shrink-0 text-emerald-400 transition-transform duration-300 group-open:rotate-180" />
+                </summary>
+                <p className="max-w-3xl pb-5 pr-8 text-sm leading-6 text-white/70">
+                  {item.answer}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+
+        {/* ─── Divider ─── */}
+        <div className="mx-auto my-16 max-w-6xl px-4 sm:my-20 sm:px-6">
+          <div className="h-px bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent" />
+        </div>
+
+        {/* ─── CTA Bantuan ─── */}
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="relative overflow-hidden rounded-[2.5rem] border border-white/[0.08] bg-white/[0.04] px-6 py-12 shadow-2xl backdrop-blur-md sm:px-10 sm:py-14 lg:px-14">
+            {/* Decorative orbs */}
+            <div className="pointer-events-none absolute -right-20 -top-24 h-80 w-80 rounded-full border-[48px] border-white/[0.04]" />
+            <div className="pointer-events-none absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-emerald-500/20 blur-3xl" />
+            <div className="pointer-events-none absolute -left-16 top-1/2 h-56 w-56 -translate-y-1/2 rounded-full bg-teal-400/10 blur-3xl" />
+
+            <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+              <div className="max-w-2xl text-white">
+                <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-white/10 px-3 py-1 text-[11px] font-semibold text-emerald-200 backdrop-blur-sm">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  Layanan Bantuan &amp; Posko Pengaduan Dumai
+                </p>
+                <h2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl text-white">
+                  Butuh Bantuan Pendaftaran BPJS Dumai?
+                </h2>
+                <p className="mt-3 max-w-xl text-sm leading-6 text-white/70 sm:text-base">
+                  Hubungi petugas Posko Layanan BPJS Kesehatan Kota Dumai melalui WhatsApp atau layanan Call Center tanggap cepat.
+                </p>
+              </div>
+              <div className="flex flex-col gap-3.5 w-full sm:w-auto">
+                <a
+                  href="https://wa.me/6281275000000?text=Halo%20Admin%20Posko%20BPJS%20Dinas%20Kesehatan%20Kota%20Dumai,%20saya%20ingin%20bertanya%20seputar%20pendaftaran"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-[52px] w-full items-center justify-center gap-3 rounded-full bg-[#4ee4a5] px-7 text-[15px] font-bold tracking-tight text-[#063328] shadow-lg shadow-emerald-950/20 no-underline transition-all duration-200 hover:bg-[#42d997] hover:scale-[1.02] active:scale-95 sm:min-w-[320px]"
+                >
+                  <MessageSquareText className="h-[21px] w-[21px] stroke-[2.2] text-[#063328]" />
+                  <span>WhatsApp Posko Dumai</span>
+                </a>
+                <a
+                  href="tel:076531000"
+                  className="inline-flex h-[52px] w-full items-center justify-center gap-3 rounded-full border border-white/20 bg-white/[0.08] px-7 text-[15px] font-bold tracking-tight text-white backdrop-blur-md no-underline transition-all duration-200 hover:border-white/40 hover:bg-white/[0.14] hover:scale-[1.02] active:scale-95 sm:min-w-[320px]"
+                >
+                  <Phone className="h-[20px] w-[20px] stroke-[2.2] text-[#4ee4a5]" />
+                  <span>Call Center: (0765) 31000 / 112</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
