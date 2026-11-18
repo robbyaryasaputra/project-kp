@@ -15,6 +15,7 @@ import {
   LockKeyhole,
   MapPin,
   MessageSquare,
+  MessageSquareText,
   Phone,
   Search,
   ShieldCheck,
@@ -23,6 +24,10 @@ import {
 } from "lucide-react";
 import logoDinkes from "@/assets/logo-dinkes.jpg";
 import heroFamily from "@/assets/hero-family.jpg";
+import advantagesBg from "@/assets/advantages-bg.jpg";
+import alurBg from "@/assets/alur-bg.jpg";
+import faskesBg from "@/assets/faskes-bg.jpg";
+import komitmenBg from "@/assets/komitmen-bg.jpg";
 import { useAuth } from "@/context/AuthContext";
 
 const EASE = [0.16, 1, 0.3, 1];
@@ -173,18 +178,27 @@ function Reveal({ children, className = "", delay = 0 }) {
   );
 }
 
-function SectionHeading({ eyebrow, title, description }) {
+function SectionHeading({ eyebrow, title, description, dark = false }) {
   return (
     <div className="mx-auto mb-10 max-w-2xl text-center sm:mb-12">
-      <p className="mb-3 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-primary-700">
-        <span className="h-px w-5 bg-emerald-500" />
+      <p
+        className={`mb-3 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] ${dark ? "text-emerald-300" : "text-primary-700"
+          }`}
+      >
+        <span className={`h-px w-5 ${dark ? "bg-emerald-400" : "bg-emerald-500"}`} />
         {eyebrow}
-        <span className="h-px w-5 bg-emerald-500" />
+        <span className={`h-px w-5 ${dark ? "bg-emerald-400" : "bg-emerald-500"}`} />
       </p>
-      <h2 className="text-3xl font-bold leading-tight tracking-tight text-neutral-900 sm:text-4xl">
+      <h2
+        className={`text-3xl font-bold leading-tight tracking-tight sm:text-4xl ${dark ? "text-white" : "text-neutral-900"
+          }`}
+      >
         {title}
       </h2>
-      <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-neutral-600 sm:text-base">
+      <p
+        className={`mx-auto mt-3 max-w-xl text-sm leading-6 sm:text-base ${dark ? "text-white/75" : "text-neutral-600"
+          }`}
+      >
         {description}
       </p>
     </div>
@@ -193,6 +207,7 @@ function SectionHeading({ eyebrow, title, description }) {
 
 export default function LandingPage() {
   const { user } = useAuth();
+  const reduceMotion = useReducedMotion();
   const registrationPath = user ? "/register" : "/login";
 
   return (
@@ -340,86 +355,158 @@ export default function LandingPage() {
         ))}
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
-        <SectionHeading
-          eyebrow="Program prioritas Pemko Dumai"
-          title="3 keunggulan BPJS Gratis Kota Dumai"
-          description="Layanan yang dirancang agar pengajuan lebih mudah dipahami, status lebih mudah dipantau, dan pilihan faskes lebih dekat dengan warga."
-        />
+      {/* ── 3 Keunggulan BPJS Dumai dengan Background Gambar Bergerak (Ken Burns Drift) ── */}
+      <section className="relative isolate overflow-hidden border-y border-emerald-950/[0.08] py-20 sm:py-28">
+        {/* Animated Moving Background Image */}
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <motion.div
+            animate={
+              reduceMotion
+                ? undefined
+                : {
+                  scale: [1, 1.08, 1.03, 1],
+                  x: ["0%", "-2.5%", "1.5%", "0%"],
+                  y: ["0%", "-1.5%", "0.8%", "0%"],
+                }
+            }
+            transition={{
+              duration: 26,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute -inset-14 bg-cover bg-center"
+            style={{ backgroundImage: `url(${advantagesBg})` }}
+          />
 
-        <div className="grid gap-4 md:grid-cols-3">
-          {advantages.map((item, index) => {
-            const Icon = item.icon;
-            return (
-              <Reveal key={item.title} delay={index * 0.06}>
-                <article className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-lg hover:shadow-primary-900/[0.06] sm:p-7">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary-100 text-primary-700">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <h3 className="mt-5 text-lg font-bold tracking-tight text-neutral-900">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-neutral-600">
-                    {item.description}
-                  </p>
-                  <ul className="mt-5 space-y-2.5 border-t border-neutral-100 pt-4">
-                    {item.points.map((point) => (
-                      <li
-                        key={point}
-                        className="flex items-start gap-2 text-xs leading-5 text-neutral-600"
-                      >
-                        <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-700" />
-                        {point}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    to={item.to}
-                    className="mt-auto inline-flex items-center gap-1 pt-6 text-xs font-bold text-primary-700 no-underline hover:text-primary-900"
-                  >
-                    {item.action}
-                    <ArrowUpRight className="h-3.5 w-3.5" />
-                  </Link>
-                </article>
-              </Reveal>
-            );
-          })}
+          {/* Frosted Glass Overlay Scrim for 100% Readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/95 via-white/88 to-white/95 backdrop-blur-[3px]" />
+
+          {/* Subtle Ambient Radial Dots Pattern */}
+          <div className="absolute inset-0 bg-[radial-gradient(#059669_0.75px,transparent_1px)] [background-size:24px_24px] opacity-[0.14]" />
+        </div>
+
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+          <SectionHeading
+            eyebrow="Program prioritas Pemko Dumai"
+            title="3 keunggulan BPJS Gratis Kota Dumai"
+            description="Layanan yang dirancang agar pengajuan lebih mudah dipahami, status lebih mudah dipantau, dan pilihan faskes lebih dekat dengan warga."
+          />
+
+          <div className="grid gap-5 md:grid-cols-3">
+            {advantages.map((item, index) => {
+              const Icon = item.icon;
+              return (
+                <Reveal key={item.title} delay={index * 0.06}>
+                  <article className="group flex h-full flex-col rounded-2xl border border-white/80 bg-white/92 p-6 shadow-[0_10px_30px_-15px_rgba(4,63,63,0.12)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1.5 hover:border-emerald-300/80 hover:bg-white hover:shadow-[0_20px_40px_-15px_rgba(4,63,63,0.18)] sm:p-7">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary-100 text-primary-700 transition-all duration-300 group-hover:scale-110 group-hover:bg-primary-700 group-hover:text-white">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="mt-5 text-lg font-bold tracking-tight text-neutral-900">
+                      {item.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-6 text-neutral-600">
+                      {item.description}
+                    </p>
+                    <ul className="mt-5 space-y-2.5 border-t border-neutral-100 pt-4">
+                      {item.points.map((point) => (
+                        <li
+                          key={point}
+                          className="flex items-start gap-2 text-xs leading-5 text-neutral-600"
+                        >
+                          <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-700" />
+                          {point}
+                        </li>
+                      ))}
+                    </ul>
+                    <Link
+                      to={item.to}
+                      className="mt-auto inline-flex items-center gap-1.5 pt-6 text-xs font-bold text-primary-700 no-underline transition-colors hover:text-emerald-700"
+                    >
+                      {item.action}
+                      <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </Link>
+                  </article>
+                </Reveal>
+              );
+            })}
+          </div>
         </div>
       </section>
 
-      <section id="alur" className="bg-white py-20 sm:py-24">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      {/* ── Syarat & Alur Pendaftaran dengan Moving Background Berwarna Berbeda (Deep Midnight Emerald Glass) ── */}
+      <section id="alur" className="relative isolate overflow-hidden border-y border-white/10 bg-[#032321] py-20 sm:py-28">
+        {/* Animated Moving Background Image (Ken Burns Drift) */}
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <motion.div
+            animate={
+              reduceMotion
+                ? undefined
+                : {
+                  scale: [1, 1.09, 1.04, 1],
+                  x: ["0%", "2.5%", "-1.5%", "0%"],
+                  y: ["0%", "-1.8%", "0.8%", "0%"],
+                }
+            }
+            transition={{
+              duration: 28,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute -inset-14 bg-cover bg-center"
+            style={{ backgroundImage: `url(${alurBg})` }}
+          />
+
+          {/* Deep Midnight Teal / Emerald Atmosphere Scrim */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#021d1b]/95 via-[#032924]/88 to-[#021816]/96 backdrop-blur-[3px]" />
+
+          {/* Subtle Ambient Radial Dots Pattern */}
+          <div className="absolute inset-0 bg-[radial-gradient(#34d399_0.75px,transparent_1px)] [background-size:24px_24px] opacity-[0.14]" />
+        </div>
+
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
           <SectionHeading
+            dark
             eyebrow="Syarat & alur pendaftaran"
             title="Hanya 3 langkah mudah"
             description="Ikuti tahapannya dari menyiapkan data sampai memeriksa hasil verifikasi."
           />
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-3">
             {steps.map((step, index) => (
-              <Reveal key={step.number} delay={index * 0.06}>
-                <article className="relative h-full rounded-2xl bg-neutral-50 p-6 sm:p-7">
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ${index === 1 ? "bg-emerald-700" : "bg-primary-950"
-                        }`}
-                    >
-                      {step.number}
-                    </span>
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-neutral-400">
-                      Langkah {index + 1}
+              <Reveal key={step.number} delay={index * 0.08}>
+                <article className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-white/15 bg-white/[0.08] p-6 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:border-emerald-400/50 hover:bg-white/[0.13] sm:p-7">
+                  {/* Subtle Top Inner Highlight */}
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`flex h-11 w-11 items-center justify-center rounded-2xl text-sm font-extrabold shadow-md transition-transform duration-300 group-hover:scale-105 ${index === 1
+                          ? "bg-emerald-400 text-[#02241e] shadow-emerald-400/30"
+                          : "border border-white/20 bg-white/10 text-emerald-200"
+                          }`}
+                      >
+                        {step.number}
+                      </span>
+                      <span className="rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-300/90 backdrop-blur-xs">
+                        Tahap {index + 1}
+                      </span>
+                    </div>
+
+                    <h3 className="mt-6 text-xl font-bold leading-snug tracking-tight text-white">
+                      {step.title}
+                    </h3>
+                    <p className="mt-2.5 text-sm leading-6 text-white/75">
+                      {step.description}
+                    </p>
+                  </div>
+
+                  <div className="mt-6 border-t border-white/10 pt-4">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-950/60 px-3 py-1.5 text-[11px] font-semibold text-emerald-300 shadow-sm">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                      {step.note}
                     </span>
                   </div>
-                  <h3 className="mt-6 text-lg font-bold leading-snug text-neutral-900">
-                    {step.title}
-                  </h3>
-                  <p className="mt-2 min-h-12 text-sm leading-6 text-neutral-600">
-                    {step.description}
-                  </p>
-                  <span className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-[11px] font-semibold text-emerald-800">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    {step.note}
-                  </span>
                 </article>
               </Reveal>
             ))}
@@ -427,75 +514,147 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-20 sm:px-6 sm:py-24 lg:grid-cols-[0.8fr_1.2fr]">
-        <Reveal>
-          <div>
-            <p className="mb-3 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-primary-700">
-              <MapPin className="h-4 w-4" />
-              Jejaring pelayanan Kota Dumai
-            </p>
-            <h2 className="text-3xl font-bold leading-tight tracking-tight text-neutral-900 sm:text-4xl">
-              Faskes tingkat pertama, lebih dekat dengan domisili.
-            </h2>
-            <p className="mt-4 text-sm leading-6 text-neutral-600 sm:text-base">
-              Pilih Puskesmas yang sesuai dengan wilayah tempat tinggal saat
-              mengisi formulir pendaftaran. Berikut beberapa contoh faskes di
-              Kota Dumai.
-            </p>
-            <Link
-              to={registrationPath}
-              className="mt-6 inline-flex h-11 items-center gap-2 rounded-xl bg-primary-800 px-5 text-sm font-semibold text-white no-underline transition-colors hover:bg-primary-700"
-            >
-              Pilih faskes saat daftar
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </Reveal>
+      {/* ── Jejaring Fasilitas Kesehatan dengan Moving Background Berwarna Berbeda (Crystalline Aqua Fog) ── */}
+      <section className="relative isolate overflow-hidden border-b border-teal-900/10 bg-[#eef7f8] py-20 sm:py-28">
+        {/* Animated Moving Background Image (Ken Burns Drift) */}
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <motion.div
+            animate={
+              reduceMotion
+                ? undefined
+                : {
+                  scale: [1, 1.07, 1.03, 1],
+                  x: ["0%", "-2%", "1%", "0%"],
+                  y: ["0%", "1.5%", "-0.8%", "0%"],
+                }
+            }
+            transition={{
+              duration: 27,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute -inset-14 bg-cover bg-center"
+            style={{ backgroundImage: `url(${faskesBg})` }}
+          />
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {facilities.map((facility, index) => (
-            <Reveal key={facility.name} delay={index * 0.04}>
-              <article className="flex h-full min-h-28 items-center gap-4 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary-100 text-primary-700">
-                  <Building2 className="h-5 w-5" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-primary-700">
-                    Faskes tingkat I
-                  </p>
-                  <h3 className="mt-1 text-sm font-bold text-neutral-900">
-                    {facility.name}
-                  </h3>
-                  <p className="mt-0.5 text-xs text-neutral-500">
-                    Kecamatan {facility.district}
-                  </p>
-                </div>
-              </article>
-            </Reveal>
-          ))}
+          {/* Fresh Crystalline Aqua / Cerulean Fog Overlay Scrim */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#eaf5f6]/94 via-[#dff1f2]/88 to-[#ebf7f6]/95 backdrop-blur-[3px]" />
+
+          {/* Subtle Ambient Radial Dots Pattern */}
+          <div className="absolute inset-0 bg-[radial-gradient(#0891b2_0.75px,transparent_1px)] [background-size:24px_24px] opacity-[0.14]" />
+        </div>
+
+        <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr]">
+          <Reveal>
+            <div>
+              <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-teal-200/80 bg-white/90 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-teal-800 shadow-xs backdrop-blur-md">
+                <MapPin className="h-4 w-4 text-teal-600" />
+                Jejaring pelayanan Kota Dumai
+              </p>
+              <h2 className="text-3xl font-extrabold leading-tight tracking-tight text-neutral-900 sm:text-4xl">
+                Faskes tingkat pertama, lebih dekat dengan domisili.
+              </h2>
+              <p className="mt-4 text-sm leading-7 text-neutral-700 sm:text-base">
+                Pilih Puskesmas yang sesuai dengan wilayah tempat tinggal saat
+                mengisi formulir pendaftaran. Terhubung dengan 7 kecamatan di
+                Kota Dumai.
+              </p>
+              <Link
+                to={registrationPath}
+                className="mt-7 inline-flex h-12 items-center gap-2.5 rounded-xl bg-teal-800 px-6 text-sm font-bold text-white shadow-lg shadow-teal-950/20 no-underline transition-all duration-200 hover:bg-teal-700 hover:scale-[1.02] active:scale-95"
+              >
+                Pilih faskes saat daftar
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </Reveal>
+
+          <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+            {facilities.map((facility, index) => (
+              <Reveal key={facility.name} delay={index * 0.05}>
+                <article className="group flex h-full min-h-28 items-center gap-4 rounded-2xl border border-white/80 bg-white/88 p-4.5 shadow-[0_10px_30px_-15px_rgba(8,145,178,0.12)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-teal-300 hover:bg-white hover:shadow-[0_20px_40px_-15px_rgba(8,145,178,0.2)]">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-teal-100 bg-teal-50 text-teal-700 transition-all duration-300 group-hover:scale-110 group-hover:bg-teal-700 group-hover:text-white">
+                    <Building2 className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-teal-700">
+                      Faskes tingkat I
+                    </p>
+                    <h3 className="mt-1 text-sm font-bold text-neutral-900">
+                      {facility.name}
+                    </h3>
+                    <p className="mt-0.5 text-xs text-neutral-600">
+                      Kecamatan {facility.district}
+                    </p>
+                  </div>
+                </article>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="bg-[#f0f4f3] py-20 sm:py-24">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      {/* ── Komitmen Pemko Dumai dengan Moving Background (Warm Amber Dusk / Dumai Waterfront Aerial) ── */}
+      <section className="relative isolate overflow-hidden border-y border-amber-900/10 py-20 sm:py-28">
+        {/* Animated Moving Background — Ken Burns Cinematic Drift */}
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <motion.div
+            animate={
+              reduceMotion
+                ? undefined
+                : {
+                  scale: [1, 1.08, 1.04, 1],
+                  x: ["0%", "2%", "-1.5%", "0%"],
+                  y: ["0%", "1.2%", "-1%", "0%"],
+                }
+            }
+            transition={{
+              duration: 30,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute -inset-14 bg-cover bg-center"
+            style={{ backgroundImage: `url(${komitmenBg})` }}
+          />
+
+          {/* Warm Amber Dusk Scrim — distinct from teal/emerald sections */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#1a0e05]/88 via-[#2d1a06]/80 to-[#1a0d04]/90 backdrop-blur-[3px]" />
+
+          {/* Subtle Gold Radial Dot Texture */}
+          <div className="absolute inset-0 bg-[radial-gradient(#f59e0b_0.75px,transparent_1px)] [background-size:24px_24px] opacity-[0.10]" />
+        </div>
+
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
           <SectionHeading
+            dark
             eyebrow="Komitmen Pemko Dumai"
             title="Perlindungan yang terasa manfaatnya"
             description="Informasi layanan, langkah pengajuan, dan tindak lanjut disajikan dalam satu tempat."
           />
-          <div className="grid gap-x-8 gap-y-7 sm:grid-cols-2 lg:grid-cols-4">
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {commitments.map((item, index) => {
               const Icon = item.icon;
               return (
-                <Reveal key={item.title} delay={index * 0.04}>
-                  <article className="h-full border-l-2 border-emerald-600 pl-4">
-                    <Icon className="h-5 w-5 text-primary-700" />
-                    <h3 className="mt-3 text-sm font-bold text-neutral-900">
-                      {item.title}
-                    </h3>
-                    <p className="mt-1.5 text-xs leading-5 text-neutral-600">
-                      {item.description}
-                    </p>
+                <Reveal key={item.title} delay={index * 0.06}>
+                  <article className="group relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.07] p-5 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:border-amber-400/40 hover:bg-white/[0.12] sm:p-6">
+                    {/* Top inner glow */}
+                    <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/30 to-transparent" />
+
+                    {/* Left accent bar */}
+                    <div className="absolute inset-y-4 left-0 w-[3px] rounded-full bg-gradient-to-b from-amber-400 via-amber-300 to-amber-500/50" />
+
+                    <div className="pl-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-500/10 text-amber-300 transition-all duration-300 group-hover:scale-110 group-hover:bg-amber-500/20">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <h3 className="mt-4 text-sm font-bold text-white">
+                        {item.title}
+                      </h3>
+                      <p className="mt-2 text-xs leading-5 text-white/70">
+                        {item.description}
+                      </p>
+                    </div>
                   </article>
                 </Reveal>
               );
@@ -529,37 +688,37 @@ export default function LandingPage() {
       </section>
 
       <section className="px-4 pb-16 sm:px-6 sm:pb-20">
-        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-primary-950 px-6 py-12 text-white shadow-xl sm:px-10 sm:py-14 lg:px-14">
+        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-primary-950 via-[#033830] to-[#02241e] px-6 py-12 text-white shadow-2xl sm:px-10 sm:py-14 lg:px-14">
           <div className="pointer-events-none absolute -right-20 -top-24 h-80 w-80 rounded-full border-[48px] border-white/[0.035]" />
-          <div className="pointer-events-none absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-emerald-500/15 blur-3xl" />
           <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
-              <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-emerald-200">
+              <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-emerald-200 backdrop-blur-sm">
                 <ShieldCheck className="h-3.5 w-3.5" />
                 Layanan Bantuan &amp; Posko Pengaduan Dumai
               </p>
               <h2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
                 Butuh Bantuan Pendaftaran BPJS Dumai?
               </h2>
-              <p className="mt-3 max-w-xl text-sm leading-6 text-white/65 sm:text-base">
+              <p className="mt-3 max-w-xl text-sm leading-6 text-white/70 sm:text-base">
                 Hubungi petugas Posko Layanan BPJS Kesehatan Kota Dumai melalui WhatsApp atau layanan Call Center tanggap cepat.
               </p>
             </div>
-            <div className="flex flex-col gap-3 w-full sm:w-auto">
+            <div className="flex flex-col gap-3.5 w-full sm:w-auto">
               <a
                 href="https://wa.me/6281275000000?text=Halo%20Admin%20Posko%20BPJS%20Dinas%20Kesehatan%20Kota%20Dumai,%20saya%20ingin%20bertanya%20seputar%20pendaftaran"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl bg-emerald-400 px-6 text-sm font-bold text-primary-950 shadow-md shadow-emerald-500/20 no-underline transition-all duration-200 hover:bg-emerald-300 hover:scale-[1.02] active:scale-95 sm:min-w-[280px]"
+                className="inline-flex h-[52px] w-full items-center justify-center gap-3 rounded-full bg-[#4ee4a5] px-7 text-[15px] font-bold tracking-tight text-[#063328] shadow-lg shadow-emerald-950/20 no-underline transition-all duration-200 hover:bg-[#42d997] hover:scale-[1.02] active:scale-95 sm:min-w-[320px]"
               >
-                <MessageSquare className="h-4 w-4 text-primary-950" />
+                <MessageSquareText className="h-[21px] w-[21px] stroke-[2.2] text-[#063328]" />
                 <span>WhatsApp Posko Dumai</span>
               </a>
               <a
                 href="tel:076531000"
-                className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl border border-white/20 bg-white/[0.06] px-6 text-sm font-semibold text-white backdrop-blur-xs no-underline transition-all duration-200 hover:border-emerald-400/50 hover:bg-white/10 hover:scale-[1.02] active:scale-95 sm:min-w-[280px]"
+                className="inline-flex h-[52px] w-full items-center justify-center gap-3 rounded-full border border-white/20 bg-white/[0.08] px-7 text-[15px] font-bold tracking-tight text-white backdrop-blur-md no-underline transition-all duration-200 hover:border-white/40 hover:bg-white/[0.14] hover:scale-[1.02] active:scale-95 sm:min-w-[320px]"
               >
-                <Phone className="h-4 w-4 text-emerald-400" />
+                <Phone className="h-[20px] w-[20px] stroke-[2.2] text-[#4ee4a5]" />
                 <span>Call Center: (0765) 31000 / 112</span>
               </a>
             </div>
