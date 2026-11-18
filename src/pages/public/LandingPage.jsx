@@ -14,6 +14,8 @@ import {
   HeartPulse,
   LockKeyhole,
   MapPin,
+  MessageSquare,
+  Phone,
   Search,
   ShieldCheck,
   Smartphone,
@@ -534,30 +536,32 @@ export default function LandingPage() {
             <div className="max-w-2xl">
               <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-emerald-200">
                 <ShieldCheck className="h-3.5 w-3.5" />
-                Program jaminan kesehatan Kota Dumai
+                Layanan Bantuan &amp; Posko Pengaduan Dumai
               </p>
               <h2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
-                Siap mengajukan pendaftaran?
+                Butuh Bantuan Pendaftaran BPJS Dumai?
               </h2>
               <p className="mt-3 max-w-xl text-sm leading-6 text-white/65 sm:text-base">
-                Siapkan data keluarga dan mulai pengajuan melalui portal
-                pendaftaran BPJS Kesehatan Kota Dumai.
+                Hubungi petugas Posko Layanan BPJS Kesehatan Kota Dumai melalui WhatsApp atau layanan Call Center tanggap cepat.
               </p>
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Link to={registrationPath} className="no-underline">
-                <span className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-5 text-sm font-bold text-primary-950 transition-colors hover:bg-emerald-300 sm:w-auto">
-                  Daftar sekarang
-                  <ArrowRight className="h-4 w-4" />
-                </span>
-              </Link>
-              <Link
-                to="/cek-status"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-white/20 px-5 text-sm font-semibold text-white no-underline transition-colors hover:bg-white/10"
+            <div className="flex flex-col gap-3 w-full sm:w-auto">
+              <a
+                href="https://wa.me/6281275000000?text=Halo%20Admin%20Posko%20BPJS%20Dinas%20Kesehatan%20Kota%20Dumai,%20saya%20ingin%20bertanya%20seputar%20pendaftaran"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl bg-emerald-400 px-6 text-sm font-bold text-primary-950 shadow-md shadow-emerald-500/20 no-underline transition-all duration-200 hover:bg-emerald-300 hover:scale-[1.02] active:scale-95 sm:min-w-[280px]"
               >
-                <Search className="h-4 w-4" />
-                Cek status
-              </Link>
+                <MessageSquare className="h-4 w-4 text-primary-950" />
+                <span>WhatsApp Posko Dumai</span>
+              </a>
+              <a
+                href="tel:076531000"
+                className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl border border-white/20 bg-white/[0.06] px-6 text-sm font-semibold text-white backdrop-blur-xs no-underline transition-all duration-200 hover:border-emerald-400/50 hover:bg-white/10 hover:scale-[1.02] active:scale-95 sm:min-w-[280px]"
+              >
+                <Phone className="h-4 w-4 text-emerald-400" />
+                <span>Call Center: (0765) 31000 / 112</span>
+              </a>
             </div>
           </div>
         </div>
