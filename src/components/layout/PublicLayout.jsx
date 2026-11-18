@@ -56,18 +56,18 @@ export default function PublicLayout() {
             reduceMotion
               ? { width: "100%", opacity: 0 }
               : {
-                  width: ["0%", "35%", "85%", "100%"],
-                  opacity: [1, 1, 1, 0],
-                }
+                width: ["0%", "35%", "85%", "100%"],
+                opacity: [1, 1, 1, 0],
+              }
           }
           transition={
             reduceMotion
               ? { duration: 0 }
               : {
-                  duration: 0.45,
-                  times: [0, 0.25, 0.65, 1],
-                  ease: [0.16, 1, 0.3, 1],
-                }
+                duration: 0.45,
+                times: [0, 0.25, 0.65, 1],
+                ease: [0.16, 1, 0.3, 1],
+              }
           }
           className="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.9)] relative"
         >
@@ -109,11 +109,10 @@ export default function PublicLayout() {
                   <Link
                     key={link.to}
                     to={link.to}
-                    className={`relative z-10 flex items-center gap-2 rounded-full px-3.5 py-2 text-xs no-underline transition-colors duration-200 ${
-                      isActive
-                        ? "font-semibold text-primary-950"
-                        : "font-medium text-white/70 hover:text-white"
-                    }`}
+                    className={`relative z-10 flex items-center gap-2 rounded-full px-3.5 py-2 text-xs no-underline transition-colors duration-200 ${isActive
+                      ? "font-semibold text-primary-950"
+                      : "font-medium text-white/70 hover:text-white"
+                      }`}
                   >
                     {isActive && (
                       <motion.div
@@ -123,17 +122,16 @@ export default function PublicLayout() {
                           reduceMotion
                             ? { duration: 0 }
                             : {
-                                type: "spring",
-                                stiffness: 400,
-                                damping: 30,
-                              }
+                              type: "spring",
+                              stiffness: 400,
+                              damping: 30,
+                            }
                         }
                       />
                     )}
                     <Icon
-                      className={`h-3.5 w-3.5 transition-colors duration-200 ${
-                        isActive ? "text-emerald-700" : "text-white/50"
-                      }`}
+                      className={`h-3.5 w-3.5 transition-colors duration-200 ${isActive ? "text-emerald-700" : "text-white/50"
+                        }`}
                     />
                     <span>{link.label}</span>
                   </Link>
@@ -164,18 +162,13 @@ export default function PublicLayout() {
                   ) : (
                     <Link
                       to="/login"
-                      className="hidden rounded-full px-3 py-2 text-xs font-semibold text-white/75 no-underline transition-colors hover:text-white sm:inline-flex"
+                      className="hidden items-center gap-1.5 rounded-full bg-red-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-red-950/25 no-underline transition-all duration-200 hover:bg-red-500 hover:shadow-red-600/35 active:scale-95 sm:inline-flex"
                     >
-                      Masuk
+                      <LogIn className="h-3.5 w-3.5" />
+                      <span>LOGIN</span>
                     </Link>
                   )}
-                  <Link
-                    to={user ? "/register" : "/login"}
-                    className="hidden items-center gap-1.5 rounded-full bg-emerald-400 px-4 py-2 text-xs font-bold text-primary-950 no-underline shadow-sm transition-colors hover:bg-emerald-300 sm:inline-flex"
-                  >
-                    <FileText className="h-3.5 w-3.5" />
-                    Daftar Gratis
-                  </Link>
+
                 </>
               )}
 
@@ -218,16 +211,14 @@ export default function PublicLayout() {
                       key={link.to}
                       to={link.to}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm no-underline transition-colors ${
-                        isActive
-                          ? "bg-white/10 font-semibold text-white"
-                          : "font-medium text-white/70 hover:bg-white/5 hover:text-white"
-                      }`}
+                      className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm no-underline transition-colors ${isActive
+                        ? "bg-white/10 font-semibold text-white"
+                        : "font-medium text-white/70 hover:bg-white/5 hover:text-white"
+                        }`}
                     >
                       <Icon
-                        className={`w-4 h-4 ${
-                          isActive ? "text-emerald-300" : "text-white/45"
-                        }`}
+                        className={`w-4 h-4 ${isActive ? "text-emerald-300" : "text-white/45"
+                          }`}
                       />
                       <span>{link.label}</span>
                     </Link>
@@ -267,10 +258,10 @@ export default function PublicLayout() {
                   <Link
                     to="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 py-2.5 text-sm font-bold text-primary-950 no-underline transition-colors hover:bg-emerald-300"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-2.5 text-sm font-bold text-white shadow-md shadow-red-950/20 no-underline transition-colors hover:bg-red-500"
                   >
                     <LogIn className="w-4 h-4" />
-                    <span>Daftar Gratis / Masuk</span>
+                    <span>LOGIN</span>
                   </Link>
                 )}
               </div>
