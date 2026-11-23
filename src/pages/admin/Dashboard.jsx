@@ -667,18 +667,17 @@ export default function AdminDashboard({ isVerification = false }) {
   };
 
   const handleApprove = async () => {
-    if (!cardNumber.trim()) {
-      toast.error("Nomor Kartu BPJS wajib diisi.");
-      return;
-    }
     setProcessing(true);
     try {
+      const updateData = {
+        status: "approved",
+      };
+      if (cardNumber.trim()) {
+        updateData.card_number = cardNumber.trim();
+      }
       const { error } = await supabase
         .from("applicants")
-        .update({
-          status: "approved",
-          card_number: cardNumber.trim(),
-        })
+        .update(updateData)
         .eq("id", selectedApplicant.id);
 
       if (error) throw error;
@@ -1177,7 +1176,7 @@ export default function AdminDashboard({ isVerification = false }) {
                       className="cursor-pointer"
                     >
                       <CheckCircle className="w-4 h-4 mr-1.5" />
-                      Setujui (ACC) &amp; Terbitkan Kartu
+                      Setujui (ACC) Pendaftaran
                     </Button>
                   </div>
                 ) : actionMode === "approve" ? (
@@ -1189,18 +1188,18 @@ export default function AdminDashboard({ isVerification = false }) {
                     </div>
                     <div className="space-y-1.5">
                       <Label htmlFor="quick-card-number" className="text-emerald-950 font-semibold text-xs">
-                        Nomor Kartu BPJS Kesehatan yang Diterbitkan *
+                        Nomor Kartu BPJS Kesehatan (Opsional)
                       </Label>
                       <Input
                         id="quick-card-number"
-                        placeholder="Contoh: 0001234567890"
+                        placeholder="Contoh: 0001234567890 (kosongkan jika belum diterbitkan)"
                         value={cardNumber}
                         onChange={(e) => setCardNumber(e.target.value)}
                         className="bg-white border-emerald-300 focus:border-emerald-500 font-mono"
                         autoFocus
                       />
                       <p className="text-[11px] text-emerald-700">
-                        Pastikan nomor kartu telah sesuai dengan data penerbitan BPJS Kesehatan.
+                        Nomor kartu bersifat opsional dan dapat dikosongkan jika belum diterbitkan.
                       </p>
                     </div>
                     <div className="flex items-center justify-end gap-2 pt-1">
