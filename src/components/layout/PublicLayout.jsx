@@ -96,7 +96,7 @@ export default function PublicLayout() {
                   DINKES KOTA DUMAI
                 </span>
                 <p className="mt-0.5 hidden text-[10px] leading-tight text-white/60 sm:block">
-                  Program UHC &amp; PBI APBD Kota Dumai
+                  APBD Kota Dumai
                 </p>
               </div>
             </Link>

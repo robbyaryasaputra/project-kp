@@ -28,6 +28,7 @@ import advantagesBg from "@/assets/advantages-bg.jpg";
 import alurBg from "@/assets/alur-bg.jpg";
 import faskesBg from "@/assets/faskes-bg.jpg";
 import komitmenBg from "@/assets/komitmen-bg.jpg";
+import faqBg from "@/assets/faq-bg.jpg";
 import { useAuth } from "@/context/AuthContext";
 
 const EASE = [0.16, 1, 0.3, 1];
@@ -622,7 +623,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Komitmen Pemko Dumai dengan Moving Background (Warm Amber Dusk / Dumai Waterfront Aerial) ── */}
-      <section className="relative isolate overflow-hidden border-y border-amber-900/10 py-20 sm:py-28">
+      <section className="relative isolate overflow-hidden border-t border-amber-900/10 py-20 sm:py-28">
         {/* Animated Moving Background — Ken Burns Cinematic Drift */}
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <motion.div
@@ -690,8 +691,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── FAQ + CTA Bantuan — Gabung Satu Background Bergerak (Dumai Twilight Waterfront) ── */}
-      <section className="relative isolate overflow-hidden border-t border-white/10 bg-[#021d1b] pb-16 pt-20 sm:pb-24 sm:pt-28">
+      {/* ── FAQ + CTA Bantuan — (Deep Oceanic Twilight Petrol / FAQ Dumai) ── */}
+      <section className="relative isolate overflow-hidden bg-[#08222b] pb-16 pt-20 sm:pb-24 sm:pt-28">
         {/* Animated Moving Background — Ken Burns Cinematic Drift */}
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <motion.div
@@ -706,14 +707,18 @@ export default function LandingPage() {
             }
             transition={{ duration: 32, repeat: Infinity, ease: "easeInOut" }}
             className="absolute -inset-14 bg-cover bg-center"
-            style={{ backgroundImage: `url(${komitmenBg})` }}
+            style={{ backgroundImage: `url(${faqBg})` }}
           />
 
-          {/* Deep Twilight Teal-Indigo Scrim */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#011614]/94 via-[#022b25]/88 to-[#01110e]/95 backdrop-blur-[3px]" />
+          {/* Deep Oceanic Petrol Teal Scrim — distinct & more luminous than the dark footer */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#061e26]/92 via-[#0b333f]/84 to-[#072029]/94 backdrop-blur-[3px]" />
 
-          {/* Fine Emerald Dot Texture */}
-          <div className="absolute inset-0 bg-[radial-gradient(#34d399_0.6px,transparent_1px)] [background-size:22px_22px] opacity-[0.08]" />
+          {/* Fine Cyan/Aqua Dot Texture */}
+          <div className="absolute inset-0 bg-[radial-gradient(#38bdf8_0.65px,transparent_1px)] [background-size:24px_24px] opacity-[0.10]" />
+
+          {/* Subtle Ambient Glow Orbs */}
+          <div className="pointer-events-none absolute -left-20 top-1/4 h-80 w-80 rounded-full bg-cyan-500/15 blur-3xl" />
+          <div className="pointer-events-none absolute -right-20 bottom-1/4 h-80 w-80 rounded-full bg-teal-400/15 blur-3xl" />
         </div>
 
         {/* ─── FAQ Area ─── */}
@@ -728,13 +733,13 @@ export default function LandingPage() {
             {questions.map((item) => (
               <details
                 key={item.question}
-                className="group rounded-2xl border border-white/10 bg-white/[0.06] px-5 shadow-[0_8px_24px_-10px_rgba(0,0,0,0.4)] backdrop-blur-xl transition-all duration-200 open:border-emerald-400/30 open:bg-white/[0.10]"
+                className="group rounded-2xl border border-white/10 bg-white/[0.07] px-5 shadow-[0_8px_24px_-10px_rgba(0,0,0,0.4)] backdrop-blur-xl transition-all duration-200 hover:border-cyan-400/30 open:border-cyan-400/40 open:bg-white/[0.11]"
               >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-sm font-semibold text-white marker:content-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-sm font-semibold text-white marker:content-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent [&::-webkit-details-marker]:hidden">
                   {item.question}
-                  <ChevronDown className="h-4 w-4 shrink-0 text-emerald-400 transition-transform duration-300 group-open:rotate-180" />
+                  <ChevronDown className="h-4 w-4 shrink-0 text-cyan-300 transition-transform duration-300 group-open:rotate-180" />
                 </summary>
-                <p className="max-w-3xl pb-5 pr-8 text-sm leading-6 text-white/70">
+                <p className="max-w-3xl pb-5 pr-8 text-sm leading-6 text-white/75">
                   {item.answer}
                 </p>
               </details>
@@ -744,20 +749,20 @@ export default function LandingPage() {
 
         {/* ─── Divider ─── */}
         <div className="mx-auto my-16 max-w-6xl px-4 sm:my-20 sm:px-6">
-          <div className="h-px bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent" />
+          <div className="h-px bg-gradient-to-r from-transparent via-cyan-400/35 to-transparent" />
         </div>
 
         {/* ─── CTA Bantuan ─── */}
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="relative overflow-hidden rounded-[2.5rem] border border-white/[0.08] bg-white/[0.04] px-6 py-12 shadow-2xl backdrop-blur-md sm:px-10 sm:py-14 lg:px-14">
+          <div className="relative overflow-hidden rounded-[2.5rem] border border-white/[0.12] bg-white/[0.06] px-6 py-12 shadow-2xl backdrop-blur-md sm:px-10 sm:py-14 lg:px-14">
             {/* Decorative orbs */}
             <div className="pointer-events-none absolute -right-20 -top-24 h-80 w-80 rounded-full border-[48px] border-white/[0.04]" />
             <div className="pointer-events-none absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-emerald-500/20 blur-3xl" />
-            <div className="pointer-events-none absolute -left-16 top-1/2 h-56 w-56 -translate-y-1/2 rounded-full bg-teal-400/10 blur-3xl" />
+            <div className="pointer-events-none absolute -left-16 top-1/2 h-56 w-56 -translate-y-1/2 rounded-full bg-cyan-400/15 blur-3xl" />
 
             <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-2xl text-white">
-                <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-white/10 px-3 py-1 text-[11px] font-semibold text-emerald-200 backdrop-blur-sm">
+                <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-white/10 px-3 py-1 text-[11px] font-semibold text-cyan-200 backdrop-blur-sm">
                   <ShieldCheck className="h-3.5 w-3.5" />
                   Layanan Bantuan &amp; Posko Pengaduan Dumai
                 </p>
