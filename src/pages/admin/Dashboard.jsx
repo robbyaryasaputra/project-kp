@@ -1059,9 +1059,8 @@ export default function AdminDashboard({ isVerification = false }) {
                     ].map(([lbl, val, full], idx) => (
                       <div
                         key={idx}
-                        className={`p-2.5 rounded-lg bg-neutral-50/80 border border-neutral-100 ${
-                          full ? "col-span-2" : ""
-                        }`}
+                        className={`p-2.5 rounded-lg bg-neutral-50/80 border border-neutral-100 ${full ? "col-span-2" : ""
+                          }`}
                       >
                         <p className="text-[10px] uppercase font-bold text-neutral-400">
                           {lbl}
