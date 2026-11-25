@@ -741,26 +741,16 @@ export default function AdminDashboard({ isVerification = false }) {
   ══════════════════════════════════════════════════════════════ */
   return (
     <div className="animate-fade-in space-y-7 pb-10">
-      {/* ── Header Title & Stats Bar ── */}
+      {/* ── Header Title & Actions ── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 text-xs font-semibold border border-amber-200/60 mb-2">
-            <Clock className="w-3.5 h-3.5 animate-pulse" />
-            Mode Verifikasi Berkas
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-neutral-900">
+          <h1 className="text-2xl font-bold text-neutral-900 flex items-center gap-2">
+            <ClipboardCheck className="w-6 h-6 text-primary-500" />
             Antrean Verifikasi Pendaftar
           </h1>
         </div>
 
-        {/* Counter Pill */}
         <div className="flex items-center gap-2">
-          <div className="px-3.5 py-2 rounded-xl bg-white border border-neutral-200 shadow-sm flex items-center gap-2.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping" />
-            <span className="text-xs font-bold text-neutral-800">
-              {stats.pending} Berkas Pending
-            </span>
-          </div>
           <Button
             variant="outline"
             size="icon"
