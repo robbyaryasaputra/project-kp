@@ -127,10 +127,10 @@ export default function AuthPage() {
             reduceMotion
               ? undefined
               : {
-                  scale: [1, 1.07, 1.03, 1],
-                  x: ["0%", "-2%", "1%", "0%"],
-                  y: ["0%", "1.5%", "-0.8%", "0%"],
-                }
+                scale: [1, 1.07, 1.03, 1],
+                x: ["0%", "-2%", "1%", "0%"],
+                y: ["0%", "1.5%", "-0.8%", "0%"],
+              }
           }
           transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
           className="absolute -inset-14 bg-cover bg-center"
@@ -208,7 +208,7 @@ export default function AuthPage() {
                 />
               </div>
               <div>
-                <p className="text-sm font-bold tracking-wide text-white">BPJS Kesehatan</p>
+                <p className="text-sm font-bold tracking-wide text-white">DINKES KOTA DUMAI</p>
                 <p className="text-xs text-white/75">Layanan Kota Dumai</p>
               </div>
             </div>
@@ -275,11 +275,10 @@ export default function AuthPage() {
                 aria-selected={tab === "login"}
                 aria-controls="auth-panel"
                 onClick={() => changeTab("login")}
-                className={`min-h-10 rounded-lg px-3 text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${
-                  tab === "login"
+                className={`min-h-10 rounded-lg px-3 text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${tab === "login"
                     ? "bg-white text-primary-700 shadow-sm"
                     : "text-neutral-500 hover:text-neutral-800"
-                }`}
+                  }`}
               >
                 Masuk
               </button>
@@ -290,11 +289,10 @@ export default function AuthPage() {
                 aria-selected={tab === "register"}
                 aria-controls="auth-panel"
                 onClick={() => changeTab("register")}
-                className={`min-h-10 rounded-lg px-3 text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${
-                  tab === "register"
+                className={`min-h-10 rounded-lg px-3 text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${tab === "register"
                     ? "bg-white text-primary-700 shadow-sm"
                     : "text-neutral-500 hover:text-neutral-800"
-                }`}
+                  }`}
               >
                 Daftar akun
               </button>
@@ -328,9 +326,8 @@ export default function AuthPage() {
                         placeholder="nama@email.com"
                         aria-invalid={Boolean(errors.email)}
                         aria-describedby={errors.email ? "login-email-error" : undefined}
-                        className={`h-12 rounded-xl border-neutral-200 bg-neutral-50/70 pl-11 focus:bg-white ${
-                          errors.email ? "border-red-400 focus:border-red-500" : ""
-                        }`}
+                        className={`h-12 rounded-xl border-neutral-200 bg-neutral-50/70 pl-11 focus:bg-white ${errors.email ? "border-red-400 focus:border-red-500" : ""
+                          }`}
                         value={loginForm.email}
                         onChange={(e) => updateLoginField("email", e.target.value)}
                       />
@@ -364,9 +361,8 @@ export default function AuthPage() {
                         aria-describedby={
                           errors.password ? "login-password-error" : undefined
                         }
-                        className={`h-12 rounded-xl border-neutral-200 bg-neutral-50/70 pl-11 pr-12 focus:bg-white ${
-                          errors.password ? "border-red-400 focus:border-red-500" : ""
-                        }`}
+                        className={`h-12 rounded-xl border-neutral-200 bg-neutral-50/70 pl-11 pr-12 focus:bg-white ${errors.password ? "border-red-400 focus:border-red-500" : ""
+                          }`}
                         value={loginForm.password}
                         onChange={(e) =>
                           updateLoginField("password", e.target.value)
@@ -436,11 +432,10 @@ export default function AuthPage() {
                         aria-describedby={
                           errors.full_name ? "reg-name-error" : undefined
                         }
-                        className={`h-11 rounded-xl border-neutral-200 bg-neutral-50/70 pl-11 focus:bg-white ${
-                          errors.full_name
+                        className={`h-11 rounded-xl border-neutral-200 bg-neutral-50/70 pl-11 focus:bg-white ${errors.full_name
                             ? "border-red-400 focus:border-red-500"
                             : ""
-                        }`}
+                          }`}
                         value={registerForm.full_name}
                         onChange={(e) =>
                           updateRegisterField("full_name", e.target.value)
@@ -475,9 +470,8 @@ export default function AuthPage() {
                         placeholder="nama@email.com"
                         aria-invalid={Boolean(errors.email)}
                         aria-describedby={errors.email ? "reg-email-error" : undefined}
-                        className={`h-11 rounded-xl border-neutral-200 bg-neutral-50/70 pl-11 focus:bg-white ${
-                          errors.email ? "border-red-400 focus:border-red-500" : ""
-                        }`}
+                        className={`h-11 rounded-xl border-neutral-200 bg-neutral-50/70 pl-11 focus:bg-white ${errors.email ? "border-red-400 focus:border-red-500" : ""
+                          }`}
                         value={registerForm.email}
                         onChange={(e) =>
                           updateRegisterField("email", e.target.value)
@@ -513,9 +507,8 @@ export default function AuthPage() {
                         aria-describedby={
                           errors.password ? "reg-password-error" : undefined
                         }
-                        className={`h-11 rounded-xl border-neutral-200 bg-neutral-50/70 pl-11 pr-12 focus:bg-white ${
-                          errors.password ? "border-red-400 focus:border-red-500" : ""
-                        }`}
+                        className={`h-11 rounded-xl border-neutral-200 bg-neutral-50/70 pl-11 pr-12 focus:bg-white ${errors.password ? "border-red-400 focus:border-red-500" : ""
+                          }`}
                         value={registerForm.password}
                         onChange={(e) =>
                           updateRegisterField("password", e.target.value)
@@ -568,11 +561,10 @@ export default function AuthPage() {
                             ? "reg-confirm-error"
                             : undefined
                         }
-                        className={`h-11 rounded-xl border-neutral-200 bg-neutral-50/70 pl-11 focus:bg-white ${
-                          errors.confirmPassword
+                        className={`h-11 rounded-xl border-neutral-200 bg-neutral-50/70 pl-11 focus:bg-white ${errors.confirmPassword
                             ? "border-red-400 focus:border-red-500"
                             : ""
-                        }`}
+                          }`}
                         value={registerForm.confirmPassword}
                         onChange={(e) =>
                           updateRegisterField("confirmPassword", e.target.value)
