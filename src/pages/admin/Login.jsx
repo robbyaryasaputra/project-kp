@@ -1,7 +1,9 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { motion, useReducedMotion } from "framer-motion";
 import {
+  ArrowLeft,
   Eye,
   EyeOff,
   Loader2,
@@ -12,12 +14,14 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabaseClient";
 import logoDinkes from "@/assets/logo-dinkes.jpg";
+import komitmenBg from "@/assets/komitmen-bg.jpg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
+  const reduceMotion = useReducedMotion();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -48,18 +52,45 @@ export default function AdminLogin() {
   };
 
   return (
-    <main className="relative flex min-h-screen w-full max-w-[100vw] items-center justify-center overflow-hidden bg-neutral-50 px-4 py-8 sm:px-8">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -left-40 top-[-10rem] h-[28rem] w-[28rem] rounded-full bg-primary-200/50 blur-3xl"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-48 -right-32 h-[32rem] w-[32rem] rounded-full bg-blue-200/40 blur-3xl"
-      />
+    <main className="relative isolate flex min-h-screen w-full max-w-[100vw] items-center justify-center overflow-hidden px-4 py-8 sm:px-8">
+      {/* ── Cinematic Moving Background (Ken Burns Drift) ── */}
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <motion.div
+          animate={
+            reduceMotion
+              ? undefined
+              : {
+                scale: [1, 1.08, 1.04, 1],
+                x: ["0%", "-2%", "1.5%", "0%"],
+                y: ["0%", "1.5%", "-1%", "0%"],
+              }
+          }
+          transition={{ duration: 32, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -inset-14 bg-cover bg-center"
+          style={{ backgroundImage: `url(${komitmenBg})` }}
+        />
 
-      <div className="relative w-full min-w-0 max-w-6xl animate-slide-up">
-        <div className="grid min-w-0 overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-[0_32px_100px_-44px_rgba(15,23,42,0.35)] lg:min-h-[680px] lg:grid-cols-[1.03fr_0.97fr]">
+        {/* Multi-layered Executive Indigo-Teal Atmospheric Scrim */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#02181d]/92 via-[#062430]/84 to-[#0a1a2c]/94 backdrop-blur-[3px]" />
+
+        {/* Subtle Ambient Radial Dots Pattern */}
+        <div className="absolute inset-0 bg-[radial-gradient(#38bdf8_0.65px,transparent_1px)] [background-size:26px_26px] opacity-[0.10]" />
+
+        {/* Ambient Luminous Orbs */}
+        <div className="absolute -left-28 top-1/4 h-96 w-96 rounded-full bg-primary-500/20 blur-3xl" />
+        <div className="absolute -right-28 bottom-1/4 h-96 w-96 rounded-full bg-violet-600/20 blur-3xl" />
+      </div>
+
+      <div className="relative z-10 w-full min-w-0 max-w-6xl animate-slide-up">
+        {/* ── Top Floating Navigation & Portal Tag ── */}
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 px-1 sm:mb-6">
+
+
+
+        </div>
+
+        {/* ── Floating Master Card ── */}
+        <div className="grid min-w-0 overflow-hidden rounded-[2rem] border border-white/30 bg-white shadow-[0_32px_100px_-20px_rgba(2,18,30,0.65),0_12px_40px_-15px_rgba(0,0,0,0.35)] backdrop-blur-xl lg:min-h-[680px] lg:grid-cols-[1.03fr_0.97fr]">
           <section className="relative isolate flex min-h-[300px] min-w-0 flex-col overflow-hidden bg-[linear-gradient(145deg,#094f4f_0%,#176e93_52%,#51418f_100%)] p-7 text-white sm:min-h-[340px] sm:p-10 lg:min-h-0 lg:p-12">
             <div
               aria-hidden="true"
@@ -79,7 +110,7 @@ export default function AdminLogin() {
             />
 
             <div className="relative flex items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg shadow-slate-950/10">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg shadow-slate-950/20 ring-2 ring-white/30">
                 <img
                   src={logoDinkes}
                   alt="Logo Dinas Kesehatan Kota Dumai"
@@ -88,7 +119,7 @@ export default function AdminLogin() {
               </div>
               <div>
                 <p className="text-sm font-bold tracking-wide">DINKES KOTA DUMAI</p>
-                <p className="text-xs text-white/70">Layanan BPJS Kesehatan</p>
+                <p className="text-xs text-white/75">Layanan BPJS Kesehatan</p>
               </div>
             </div>
 
@@ -97,18 +128,18 @@ export default function AdminLogin() {
                 Mengelola layanan,{" "}
                 <span className="text-cyan-200">menguatkan kesehatan.</span>
               </h1>
-              <p className="mt-5 max-w-md text-sm leading-7 text-white/75 sm:text-base">
+              <p className="mt-5 max-w-md text-sm leading-7 text-white/80 sm:text-base">
                 Akses ruang kerja petugas untuk memverifikasi pendaftaran BPJS
                 Kesehatan warga Kota Dumai dengan lebih mudah dan teratur.
               </p>
             </div>
 
-            <p className="relative mt-8 text-[0.65rem] font-medium uppercase tracking-[0.18em] text-white/50 lg:mt-0">
+            <p className="relative mt-8 text-[0.65rem] font-medium uppercase tracking-[0.18em] text-white/60 lg:mt-0">
               Dinas Kesehatan Kota Dumai · Indonesia
             </p>
           </section>
 
-          <section className="flex min-w-0 flex-col justify-center p-7 sm:p-10 lg:p-14">
+          <section className="flex min-w-0 flex-col justify-center bg-white p-7 sm:p-10 lg:p-14">
             <div className="mb-8">
               <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-primary-600">
                 Ruang kerja petugas
@@ -225,7 +256,7 @@ export default function AdminLogin() {
           </section>
         </div>
 
-        <p className="mt-5 text-center text-xs text-neutral-500">
+        <p className="mt-5 text-center text-xs text-white/60">
           © 2026 Dinas Kesehatan Kota Dumai · Layanan Pendaftaran BPJS Pemerintah Kota Dumai
         </p>
       </div>
