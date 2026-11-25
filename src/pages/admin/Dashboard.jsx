@@ -600,6 +600,7 @@ export default function AdminDashboard({ isVerification = false }) {
   const [applicants, setApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("pending"); // 'pending' | 'approved' | 'rejected'
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [actionMode, setActionMode] = useState(null); // 'approve' | 'reject'
@@ -610,16 +611,17 @@ export default function AdminDashboard({ isVerification = false }) {
 
   useEffect(() => {
     fetchApplicants();
-  }, []);
+  }, [isVerification, statusFilter]);
 
   const fetchApplicants = async () => {
     setLoading(true);
     try {
+      const targetStatus = isVerification ? statusFilter : "pending";
       const { data, error } = await supabase
         .from("applicants")
         .select("*")
-        .eq("status", "pending")
-        .order("created_at", { ascending: true });
+        .eq("status", targetStatus)
+        .order("created_at", { ascending: targetStatus === "pending" });
 
       if (error) throw error;
       setApplicants(data || []);
@@ -764,62 +766,76 @@ export default function AdminDashboard({ isVerification = false }) {
         </div>
       </div>
 
-      {/* ── Metric Cards Compact ── */}
+      {/* ── Summary Filter Cards (Selaras dengan RecapReport) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[
-          {
-            label: "Antrean Menunggu",
-            value: stats.pending,
-            desc: "Butuh verifikasi dokumen",
-            icon: Clock,
-            color: "text-amber-600",
-            bg: "bg-amber-50",
-            border: "border-amber-200/80",
-          },
-          {
-            label: "Total Disetujui",
-            value: stats.approved,
-            desc: "Telah terbit nomor kartu",
-            icon: CheckCircle,
-            color: "text-emerald-600",
-            bg: "bg-emerald-50",
-            border: "border-emerald-200/80",
-          },
-          {
-            label: "Total Ditolak",
-            value: stats.rejected,
-            desc: "Berkas tidak valid / ditolak",
-            icon: XCircle,
-            color: "text-red-500",
-            bg: "bg-red-50",
-            border: "border-red-200/80",
-          },
-        ].map((item, i) => {
-          const Icon = item.icon;
-          return (
-            <Card
-              key={i}
-              className={`border ${item.border} bg-white shadow-sm hover:shadow-md transition-shadow`}
-            >
-              <CardContent className="p-4 sm:p-5 flex items-center justify-between">
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">
-                    {item.label}
-                  </p>
-                  <p className="text-2xl sm:text-3xl font-black font-mono text-neutral-900 mt-0.5">
-                    {item.value}
-                  </p>
-                  <p className="text-[11px] text-neutral-500 mt-0.5">{item.desc}</p>
-                </div>
-                <div
-                  className={`w-11 h-11 rounded-2xl ${item.bg} ${item.color} flex items-center justify-center shrink-0`}
-                >
-                  <Icon className="w-5 h-5" />
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+        <Card
+          onClick={() => setStatusFilter("pending")}
+          className={`cursor-pointer transition-all border ${
+            statusFilter === "pending"
+              ? "border-amber-400 bg-amber-50/70 shadow-xs"
+              : "border-neutral-200 hover:border-amber-300 bg-white"
+          }`}
+        >
+          <CardContent className="flex items-center gap-4 p-5">
+            <div className="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+              <Clock className="w-5 h-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-amber-700">
+                {statusFilter === "pending" ? stats.pending : "Pending"}
+              </p>
+              <p className="text-xs text-neutral-600 font-medium">
+                Menunggu Verifikasi ({stats.pending})
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card
+          onClick={() => setStatusFilter("approved")}
+          className={`cursor-pointer transition-all border ${
+            statusFilter === "approved"
+              ? "border-emerald-400 bg-emerald-50/70 shadow-xs"
+              : "border-neutral-200 hover:border-emerald-300 bg-white"
+          }`}
+        >
+          <CardContent className="flex items-center gap-4 p-5">
+            <div className="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
+              <CheckCircle className="w-5 h-5 text-emerald-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-emerald-700">
+                {statusFilter === "approved" ? stats.approved : "Disetujui"}
+              </p>
+              <p className="text-xs text-neutral-600 font-medium">
+                Pendaftar Disetujui ({stats.approved})
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card
+          onClick={() => setStatusFilter("rejected")}
+          className={`cursor-pointer transition-all border ${
+            statusFilter === "rejected"
+              ? "border-red-400 bg-red-50/70 shadow-xs"
+              : "border-neutral-200 hover:border-red-300 bg-white"
+          }`}
+        >
+          <CardContent className="flex items-center gap-4 p-5">
+            <div className="w-11 h-11 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+              <XCircle className="w-5 h-5 text-red-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-red-700">
+                {statusFilter === "rejected" ? stats.rejected : "Ditolak"}
+              </p>
+              <p className="text-xs text-neutral-600 font-medium">
+                Berkas Ditolak ({stats.rejected})
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* ── Table Container ── */}
@@ -827,7 +843,11 @@ export default function AdminDashboard({ isVerification = false }) {
         <CardHeader className="p-5 sm:p-6 pb-4 border-b border-neutral-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <CardTitle className="text-base font-bold text-neutral-900">
-              Daftar Antrean Aktif
+              {statusFilter === "pending"
+                ? "Daftar Antrean Pending"
+                : statusFilter === "approved"
+                  ? "Daftar Pendaftar Disetujui"
+                  : "Daftar Pendaftar Ditolak"}
             </CardTitle>
           </div>
 
@@ -865,12 +885,16 @@ export default function AdminDashboard({ isVerification = false }) {
               <p className="text-sm font-bold text-neutral-700">
                 {searchQuery
                   ? "Pencarian Tidak Ditemukan"
-                  : "Tidak Ada Antrean Verifikasi"}
+                  : statusFilter === "pending"
+                    ? "Tidak Ada Antrean Verifikasi"
+                    : "Belum Ada Data Pendaftar"}
               </p>
               <p className="text-xs text-neutral-400 max-w-sm mt-1">
                 {searchQuery
                   ? `Tidak ada pendaftar yang cocok dengan kata kunci "${searchQuery}".`
-                  : "Semua pendaftar berstatus pending telah selesai ditinjau."}
+                  : statusFilter === "pending"
+                    ? "Semua pendaftar berstatus pending telah selesai ditinjau."
+                    : "Belum ada data pendaftar pada filter status ini."}
               </p>
             </div>
           ) : (
@@ -964,25 +988,39 @@ export default function AdminDashboard({ isVerification = false }) {
 
                         {/* Status */}
                         <TableCell>
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200/80">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                            Pending
-                          </span>
+                          <Badge
+                            variant={
+                              applicant.status === "approved"
+                                ? "success"
+                                : applicant.status === "rejected"
+                                  ? "danger"
+                                  : "warning"
+                            }
+                            className="text-xs"
+                          >
+                            {applicant.status === "approved"
+                              ? "Disetujui"
+                              : applicant.status === "rejected"
+                                ? "Ditolak"
+                                : "Pending"}
+                          </Badge>
                         </TableCell>
 
                         {/* Aksi */}
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1.5">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => openReview(applicant)}
-                              className="h-8 px-2.5 text-xs text-neutral-700 hover:text-primary-600 hover:border-primary-400 cursor-pointer"
-                              title="Review Singkat di Modal"
-                            >
-                              <Eye className="w-3.5 h-3.5 mr-1" />
-                              Quick
-                            </Button>
+                            {applicant.status === "pending" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => openReview(applicant)}
+                                className="h-8 px-2.5 text-xs text-neutral-700 hover:text-primary-600 hover:border-primary-400 cursor-pointer"
+                                title="Review Singkat di Modal"
+                              >
+                                <Eye className="w-3.5 h-3.5 mr-1" />
+                                Quick
+                              </Button>
+                            )}
                             <Button
                               size="sm"
                               onClick={() =>

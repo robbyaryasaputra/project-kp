@@ -40,6 +40,7 @@ const STATUS_CONFIG = {
     icon: Clock,
     boxClass: "bg-amber-100 text-amber-600",
     titleClass: "text-amber-700",
+    cardClass: "border-amber-400 bg-amber-50/70 shadow-xs",
   },
   approved: {
     variant: "success",
@@ -47,6 +48,7 @@ const STATUS_CONFIG = {
     icon: CheckCircle,
     boxClass: "bg-emerald-100 text-emerald-600",
     titleClass: "text-emerald-700",
+    cardClass: "border-emerald-400 bg-emerald-50/70 shadow-xs",
   },
   rejected: {
     variant: "danger",
@@ -54,6 +56,7 @@ const STATUS_CONFIG = {
     icon: XCircle,
     boxClass: "bg-red-100 text-red-600",
     titleClass: "text-red-700",
+    cardClass: "border-red-400 bg-red-50/70 shadow-xs",
   },
 };
 
@@ -360,7 +363,7 @@ export default function VerifyDetail() {
           </CardContent>
         </Card>
 
-        <Card className="border-neutral-200 bg-white">
+        <Card className={`border transition-all ${status.cardClass}`}>
           <CardContent className="flex items-center gap-4 p-5">
             <div
               className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${status.boxClass}`}
@@ -368,10 +371,10 @@ export default function VerifyDetail() {
               <StatusIcon className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <p className={`text-base font-bold ${status.titleClass}`}>
+              <p className={`text-2xl font-bold leading-tight ${status.titleClass}`}>
                 {status.label}
               </p>
-              <p className="text-xs text-neutral-600 font-medium truncate">
+              <p className="text-xs text-neutral-600 font-medium truncate mt-0.5">
                 {applicant.status === "rejected"
                   ? applicant.rejection_reason || "Berkas ditolak"
                   : applicant.status === "approved"
