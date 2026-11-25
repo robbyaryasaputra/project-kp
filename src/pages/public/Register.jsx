@@ -28,6 +28,7 @@ import {
   UserPlus,
   Home,
   Check,
+  ChevronDown,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -71,6 +72,7 @@ export default function Register() {
   const [loadingExisting, setLoadingExisting] = useState(Boolean(user));
   const [allowEditKK, setAllowEditKK] = useState(false);
   const [prefilledKkUrl, setPrefilledKkUrl] = useState(null);
+  const [showRegisteredKK, setShowRegisteredKK] = useState(false);
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(INITIAL_FORM);
@@ -474,49 +476,70 @@ export default function Register() {
             <span>Memeriksa data keluarga terdaftar...</span>
           </div>
         ) : hasExisting ? (
-          <div className="mb-8 p-5 bg-emerald-50/60 border border-emerald-200/80 rounded-2xl transition-all duration-300">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-bold text-emerald-950 flex items-center gap-2">
-                <Users className="w-4 h-4 text-emerald-600" />
-                Kartu Keluarga Terdaftar:{" "}
+          <div className="mb-8 bg-emerald-50/60 border border-emerald-200/80 rounded-2xl transition-all duration-300 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowRegisteredKK((prev) => !prev)}
+              aria-expanded={showRegisteredKK}
+              aria-controls="registered-kk-list"
+              className="w-full flex flex-wrap items-center justify-between gap-2 p-4 sm:p-5 text-left hover:bg-emerald-50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+            >
+              <p className="text-sm font-bold text-emerald-950 flex flex-wrap items-center gap-2">
+                <Users className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Kartu Keluarga Terdaftar:</span>
                 <span className="font-mono text-emerald-800 bg-white px-2 py-0.5 rounded border border-emerald-200">
                   {primaryApplicant?.family_card_number}
                 </span>
               </p>
-              <span className="text-xs font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-                {existingApplicants.length} Anggota
-              </span>
-            </div>
+              <div className="flex items-center gap-2 ml-auto">
+                <span className="text-xs font-semibold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                  {existingApplicants.length} Anggota
+                </span>
+                <ChevronDown
+                  className={`w-4 h-4 text-emerald-700 transition-transform duration-200 ${
+                    showRegisteredKK ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+            </button>
 
-            <div className="space-y-2">
-              {existingApplicants.map((a) => (
-                <div
-                  key={a.id}
-                  className="flex items-center justify-between bg-white rounded-xl px-3.5 py-2.5 border border-emerald-100 shadow-xs"
-                >
-                  <div>
-                    <p className="text-sm font-semibold text-neutral-800">{a.full_name}</p>
-                    <p className="text-xs text-neutral-500 font-mono">
-                      NIK: {a.nik} · Faskes: {a.facility_name || "-"}
-                    </p>
-                  </div>
-                  <span
-                    className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${a.status === "approved"
-                      ? "bg-emerald-100 text-emerald-700"
-                      : a.status === "rejected"
-                        ? "bg-red-100 text-red-700"
-                        : "bg-amber-100 text-amber-700"
-                      }`}
+            {showRegisteredKK && (
+              <div
+                id="registered-kk-list"
+                className="px-4 pb-4 sm:px-5 sm:pb-5 pt-3 border-t border-emerald-200/70 space-y-2 animate-fade-in"
+              >
+                {existingApplicants.map((a) => (
+                  <div
+                    key={a.id}
+                    className="flex items-center justify-between bg-white rounded-xl px-3.5 py-2.5 border border-emerald-100 shadow-xs"
                   >
-                    {a.status === "approved"
-                      ? "Disetujui"
-                      : a.status === "rejected"
-                        ? "Ditolak"
-                        : "Menunggu"}
-                  </span>
-                </div>
-              ))}
-            </div>
+                    <div>
+                      <p className="text-sm font-semibold text-neutral-800">
+                        {a.full_name}
+                      </p>
+                      <p className="text-xs text-neutral-500 font-mono">
+                        NIK: {a.nik} · Faskes: {a.facility_name || "-"}
+                      </p>
+                    </div>
+                    <span
+                      className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${
+                        a.status === "approved"
+                          ? "bg-emerald-100 text-emerald-700"
+                          : a.status === "rejected"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-amber-100 text-amber-700"
+                      }`}
+                    >
+                      {a.status === "approved"
+                        ? "Disetujui"
+                        : a.status === "rejected"
+                          ? "Ditolak"
+                          : "Menunggu"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ) : null}
 
