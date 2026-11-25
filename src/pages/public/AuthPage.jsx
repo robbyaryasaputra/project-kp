@@ -149,8 +149,8 @@ export default function AuthPage() {
       </div>
 
       <div className="relative z-10 w-full max-w-5xl">
-        {/* ── Top Floating Navigation & Trust Bar ── */}
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 px-1 sm:mb-6">
+        {/* ── Top Floating Navigation ── */}
+        <div className="mb-4 flex items-center px-1 sm:mb-6">
           <Link
             to="/"
             className="group inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-white/90 shadow-sm backdrop-blur-md no-underline transition-all duration-200 hover:border-white/40 hover:bg-white/20 hover:text-white hover:shadow-md active:scale-95"
@@ -158,14 +158,6 @@ export default function AuthPage() {
             <ArrowLeft className="h-3.5 w-3.5 transition-transform duration-200 group-hover:-translate-x-1" />
             <span>Kembali ke Beranda</span>
           </Link>
-
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-950/60 px-3.5 py-1.5 text-[11px] font-semibold text-emerald-300 shadow-sm backdrop-blur-md">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-            </span>
-            <span>Layanan Resmi Dinas Kesehatan Kota Dumai</span>
-          </div>
         </div>
 
         {/* ── The Floating Master Card ── */}
