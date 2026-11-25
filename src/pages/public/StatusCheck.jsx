@@ -66,7 +66,7 @@ export default function StatusCheck() {
   };
 
   const handleDownloadPDF = async () => {
-    if (!result) return;
+    if (!result || result.status === "rejected") return;
     try {
       // Fetch total applicants count for "Usulan" field
       const { count } = await supabase
@@ -239,15 +239,17 @@ export default function StatusCheck() {
                           </div>
                         )}
 
-                      {/* Download Bukti Pendaftaran — available for all statuses */}
-                      <Button
-                        className="mt-4"
-                        variant={result.status === "approved" ? "success" : "outline"}
-                        onClick={handleDownloadPDF}
-                      >
-                        <Download className="w-4 h-4" />
-                        Download Bukti Pendaftaran
-                      </Button>
+                      {/* Download Bukti Pendaftaran — hidden when rejected */}
+                      {result.status !== "rejected" && (
+                        <Button
+                          className="mt-4"
+                          variant={result.status === "approved" ? "success" : "outline"}
+                          onClick={handleDownloadPDF}
+                        >
+                          <Download className="w-4 h-4" />
+                          Download Bukti Pendaftaran
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </CardContent>
