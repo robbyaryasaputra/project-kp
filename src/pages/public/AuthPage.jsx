@@ -255,46 +255,7 @@ export default function AuthPage() {
               </p>
             </div>
 
-            <div
-              className="mb-7 grid grid-cols-2 rounded-xl bg-neutral-100 p-1"
-              role="tablist"
-              aria-label="Pilih masuk atau daftar"
-            >
-              <button
-                type="button"
-                role="tab"
-                id="login-tab"
-                aria-selected={tab === "login"}
-                aria-controls="auth-panel"
-                onClick={() => changeTab("login")}
-                className={`min-h-10 rounded-lg px-3 text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${tab === "login"
-                    ? "bg-white text-primary-700 shadow-sm"
-                    : "text-neutral-500 hover:text-neutral-800"
-                  }`}
-              >
-                Masuk
-              </button>
-              <button
-                type="button"
-                role="tab"
-                id="register-tab"
-                aria-selected={tab === "register"}
-                aria-controls="auth-panel"
-                onClick={() => changeTab("register")}
-                className={`min-h-10 rounded-lg px-3 text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${tab === "register"
-                    ? "bg-white text-primary-700 shadow-sm"
-                    : "text-neutral-500 hover:text-neutral-800"
-                  }`}
-              >
-                Daftar akun
-              </button>
-            </div>
-
-            <div
-              id="auth-panel"
-              role="tabpanel"
-              aria-labelledby={tab === "login" ? "login-tab" : "register-tab"}
-            >
+            <div id="auth-panel">
               {tab === "login" ? (
                 <form onSubmit={handleLogin} className="space-y-5">
                   <div className="space-y-2">
