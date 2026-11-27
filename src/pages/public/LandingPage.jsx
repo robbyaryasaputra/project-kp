@@ -297,26 +297,26 @@ export default function LandingPage() {
 
   return (
     <div className="overflow-hidden bg-[#F7F6F2] text-slate-900 selection:bg-[#0F4C81]/15 selection:text-[#0F4C81]">
-      {/* ── 1. HERO SECTION ── */}
-      <section className="relative isolate overflow-hidden">
+      {/* ── 1. HERO SECTION (Deep Marine Sapphire + Moving Image Backdrop) ── */}
+      <section className="relative isolate overflow-hidden bg-[#061729] text-white">
         <MovingBackdrop
           image={faskesBg}
           duration={32}
-          scrimClassName="bg-gradient-to-br from-[#F7F6F2]/96 via-[#F4F2EC]/90 to-[#EAE7DF]/82"
+          scrimClassName="bg-gradient-to-r from-[#061729]/92 via-[#0A2540]/82 to-[#0D3154]/74"
         />
 
         <div className="relative mx-auto max-w-[1200px] px-4 pb-16 pt-12 sm:px-6 sm:pb-24 sm:pt-20">
           <div className="grid items-center gap-12 lg:grid-cols-[0.96fr_1.04fr] lg:gap-12">
             {/* Kolom Kiri */}
             <div>
-              <h1 className="text-[clamp(2.4rem,4.5vw,3.85rem)] font-extrabold leading-[1.06] tracking-[-0.035em] text-slate-950">
+              <h1 className="text-[clamp(2.4rem,4.5vw,3.85rem)] font-extrabold leading-[1.06] tracking-[-0.035em] text-white">
                 Perlindungan Kesehatan Gratis Warga Dumai.{" "}
-                <span className="mt-1 block text-[#0F4C81]">
+                <span className="mt-1 block text-[#E0A96D]">
                   100% Ditanggung APBD.
                 </span>
               </h1>
 
-              <p className="mt-6 max-w-xl text-base leading-relaxed text-slate-600 sm:text-[17px]">
+              <p className="mt-6 max-w-xl text-base leading-relaxed text-slate-200/85 sm:text-[17px]">
                 Daftarkan seluruh anggota keluarga dalam satu Kartu Keluarga
                 secara daring tanpa antre. Cukup siapkan NIK dan KK, lalu
                 pantau status verifikasi dari satu portal terpadu.
@@ -326,7 +326,7 @@ export default function LandingPage() {
               <div className="mt-9 flex flex-col gap-3.5 sm:flex-row sm:items-center">
                 <Link
                   to={registrationPath}
-                  className="group inline-flex h-13 items-center justify-center gap-3 rounded-xl bg-[#0A2540] px-7 py-3.5 text-sm font-semibold text-white shadow-sm no-underline transition-all hover:bg-[#0F4C81] active:scale-[0.99]"
+                  className="group inline-flex h-13 items-center justify-center gap-3 rounded-xl bg-[#E0A96D] px-7 py-3.5 text-sm font-bold text-[#071B2E] shadow-lg shadow-black/20 no-underline transition-all hover:bg-[#EBC08A] active:scale-[0.99]"
                 >
                   <span>Ajukan Pendaftaran</span>
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -334,19 +334,19 @@ export default function LandingPage() {
 
                 <Link
                   to="/cek-status"
-                  className="inline-flex h-13 items-center justify-center gap-2.5 rounded-xl border border-slate-300/90 bg-white/80 px-6 py-3.5 text-sm font-semibold text-slate-800 no-underline backdrop-blur-sm transition-colors hover:border-[#0F4C81] hover:bg-white hover:text-[#0F4C81]"
+                  className="inline-flex h-13 items-center justify-center gap-2.5 rounded-xl border border-white/25 bg-white/10 px-6 py-3.5 text-sm font-semibold text-white no-underline backdrop-blur-md transition-colors hover:border-[#E0A96D]/60 hover:bg-white/15"
                 >
-                  <Search className="h-4 w-4 text-[#0F4C81]" />
+                  <Search className="h-4 w-4 text-[#E0A96D]" />
                   <span>Cek Status Berkas</span>
                 </Link>
               </div>
 
               {/* Ringkasan Syarat Singkat */}
-              <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-medium text-slate-600">
+              <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-medium text-slate-300">
                 {["Cukup NIK & KK", "Bebas Iuran Bulanan", "Proses Tercatat"].map(
                   (item) => (
                     <span key={item} className="inline-flex items-center gap-1.5">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-[#0F4C81]" />
+                      <CheckCircle2 className="h-3.5 w-3.5 text-[#E0A96D]" />
                       {item}
                     </span>
                   )
@@ -354,7 +354,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Kolom Kanan: Interactive Click-to-Next Photo Deck (Lebih Besar & Bersih) */}
+            {/* Kolom Kanan: Interactive Click-to-Next Photo Deck */}
             <Reveal className="relative mx-auto w-full max-w-[590px] lg:max-w-none">
               <div
                 onMouseEnter={() => setIsPaused(true)}
@@ -365,14 +365,14 @@ export default function LandingPage() {
                 <div
                   onClick={handleNextSlide}
                   aria-hidden="true"
-                  className="absolute right-0 top-5 hidden h-[88%] w-[94%] rotate-[2.5deg] cursor-pointer overflow-hidden rounded-3xl border border-slate-900/10 bg-slate-200 shadow-lg transition-transform duration-300 hover:rotate-[3.5deg] hover:translate-x-1 sm:block"
+                  className="absolute right-0 top-5 hidden h-[88%] w-[94%] rotate-[2.5deg] cursor-pointer overflow-hidden rounded-3xl border border-white/15 bg-[#0D2E4E] shadow-2xl transition-transform duration-300 hover:rotate-[3.5deg] hover:translate-x-1 sm:block"
                 >
                   <img
                     src={nextSlideItem.image}
                     alt=""
                     className="h-full w-full object-cover opacity-75"
                   />
-                  <div className="absolute inset-0 bg-[#0A2540]/35" />
+                  <div className="absolute inset-0 bg-[#061729]/40" />
                 </div>
 
                 {/* Layer Utama: Klik Langsung pada Gambar untuk Ganti Slide */}
@@ -387,7 +387,7 @@ export default function LandingPage() {
                     }
                   }}
                   aria-label="Klik gambar untuk melihat foto berikutnya"
-                  className="group relative cursor-pointer select-none overflow-hidden rounded-3xl bg-slate-900 shadow-[0_28px_70px_-20px_rgba(10,37,64,0.34)] ring-1 ring-black/10 transition-transform duration-200 active:scale-[0.99]"
+                  className="group relative cursor-pointer select-none overflow-hidden rounded-3xl bg-slate-900 shadow-[0_30px_70px_-15px_rgba(2,10,20,0.65)] ring-1 ring-white/15 transition-transform duration-200 active:scale-[0.99]"
                 >
                   <div className="relative aspect-[4/3.65] w-full overflow-hidden">
                     <AnimatePresence mode="wait">
@@ -456,17 +456,17 @@ export default function LandingPage() {
           </div>
 
           {/* Metrics Strip Terbuka */}
-          <div className="mt-16 border-t border-slate-900/10 pt-8 sm:mt-20">
-            <div className="grid grid-cols-2 gap-y-6 sm:grid-cols-4 sm:divide-x sm:divide-slate-900/10">
+          <div className="mt-16 border-t border-white/15 pt-8 sm:mt-20">
+            <div className="grid grid-cols-2 gap-y-6 sm:grid-cols-4 sm:divide-x sm:divide-white/15">
               {stats.map((item, idx) => (
                 <div
                   key={item.label}
                   className={idx === 0 ? "sm:pr-6" : "sm:px-6"}
                 >
-                  <p className="text-2xl font-extrabold tracking-tight text-slate-950 tabular-nums sm:text-3xl">
+                  <p className="text-2xl font-extrabold tracking-tight text-white tabular-nums sm:text-3xl">
                     {item.value}
                   </p>
-                  <p className="mt-1 text-xs font-medium text-slate-600">
+                  <p className="mt-1 text-xs font-medium text-slate-300/85">
                     {item.label}
                   </p>
                 </div>
