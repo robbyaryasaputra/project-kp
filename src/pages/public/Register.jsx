@@ -496,9 +496,8 @@ export default function Register() {
                   {existingApplicants.length} Anggota
                 </span>
                 <ChevronDown
-                  className={`w-4 h-4 text-emerald-700 transition-transform duration-200 ${
-                    showRegisteredKK ? "rotate-180" : ""
-                  }`}
+                  className={`w-4 h-4 text-emerald-700 transition-transform duration-200 ${showRegisteredKK ? "rotate-180" : ""
+                    }`}
                 />
               </div>
             </button>
@@ -522,13 +521,12 @@ export default function Register() {
                       </p>
                     </div>
                     <span
-                      className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${
-                        a.status === "approved"
+                      className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${a.status === "approved"
                           ? "bg-emerald-100 text-emerald-700"
                           : a.status === "rejected"
                             ? "bg-red-100 text-red-700"
                             : "bg-amber-100 text-amber-700"
-                      }`}
+                        }`}
                     >
                       {a.status === "approved"
                         ? "Disetujui"
@@ -962,14 +960,23 @@ export default function Register() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-2">
                 <Label htmlFor="district">Kecamatan *</Label>
-                <Input
+                <select
                   id="district"
                   name="district"
-                  placeholder="Nama Kecamatan"
                   value={form.district}
                   onChange={handleChange}
-                  className={errors.district ? "border-red-400" : ""}
-                />
+                  className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${errors.district ? "border-red-400" : "border-input"
+                    }`}
+                >
+                  <option value="">-- Pilih Kecamatan --</option>
+                  <option value="Dumai Timur">Dumai Timur</option>
+                  <option value="Bukit Kapur">Bukit Kapur</option>
+                  <option value="Dumai Barat">Dumai Barat</option>
+                  <option value="Sungai Sembilan">Sungai Sembilan</option>
+                  <option value="Medang Kampai">Medang Kampai</option>
+                  <option value="Dumai Selatan">Dumai Selatan</option>
+                  <option value="Dumai Kota">Dumai Kota</option>
+                </select>
                 {errors.district && (
                   <p className="text-xs text-red-500">{errors.district}</p>
                 )}
