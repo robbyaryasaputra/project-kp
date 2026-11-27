@@ -151,14 +151,14 @@ export default function AuthPage() {
       <div className="relative z-10 w-full max-w-5xl">
         {/* ── Top Floating Navigation ── */}
         <div className="mb-4 flex items-center sm:mb-6">
-  <Link
-    to="/"
-    className="group inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-4 py-2 text-xs font-semibold text-white shadow-sm backdrop-blur-md no-underline transition-all duration-200 hover:border-[#E0A96D]/60 hover:bg-white/20 hover:text-[#E0A96D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E0A96D] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A2540] active:scale-[0.98] sm:text-sm"
-  >
-    <ArrowLeft className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" />
-    <span>Kembali ke Beranda</span>
-  </Link>
-</div>
+          <Link
+            to="/"
+            className="group inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-4 py-2 text-xs font-semibold text-white shadow-sm backdrop-blur-md no-underline transition-all duration-200 hover:border-[#E0A96D]/60 hover:bg-white/20 hover:text-[#E0A96D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E0A96D] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A2540] active:scale-[0.98] sm:text-sm"
+          >
+            <ArrowLeft className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" />
+            <span>Kembali ke Beranda</span>
+          </Link>
+        </div>
 
         {/* ── The Floating Master Card ── */}
         <motion.div
@@ -235,7 +235,7 @@ export default function AuthPage() {
             {/* Bottom Footer Stamp */}
             <div className="relative flex items-center justify-between border-t border-white/15 pt-5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/60">
               <span>Dinas Kesehatan Kota Dumai</span>
-              
+
             </div>
           </aside>
 
@@ -386,8 +386,8 @@ export default function AuthPage() {
                           errors.full_name ? "reg-name-error" : undefined
                         }
                         className={`h-11 rounded-xl border-neutral-200 bg-neutral-50/70 pl-11 focus:bg-white ${errors.full_name
-                            ? "border-red-400 focus:border-red-500"
-                            : ""
+                          ? "border-red-400 focus:border-red-500"
+                          : ""
                           }`}
                         value={registerForm.full_name}
                         onChange={(e) =>
@@ -515,8 +515,8 @@ export default function AuthPage() {
                             : undefined
                         }
                         className={`h-11 rounded-xl border-neutral-200 bg-neutral-50/70 pl-11 focus:bg-white ${errors.confirmPassword
-                            ? "border-red-400 focus:border-red-500"
-                            : ""
+                          ? "border-red-400 focus:border-red-500"
+                          : ""
                           }`}
                         value={registerForm.confirmPassword}
                         onChange={(e) =>
