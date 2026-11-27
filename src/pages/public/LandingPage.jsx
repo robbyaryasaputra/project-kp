@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -8,21 +9,16 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
-  CreditCard,
-  FileCheck2,
   FileText,
   HeartPulse,
   LockKeyhole,
   MapPin,
-  MessageSquare,
   MessageSquareText,
   Phone,
   Search,
   ShieldCheck,
   Smartphone,
-  UsersRound,
 } from "lucide-react";
-import logoDinkes from "@/assets/logo-dinkes.jpg";
 import heroFamily from "@/assets/hero-family.jpg";
 import advantagesBg from "@/assets/advantages-bg.jpg";
 import alurBg from "@/assets/alur-bg.jpg";
@@ -34,50 +30,53 @@ import { useAuth } from "@/context/AuthContext";
 const EASE = [0.16, 1, 0.3, 1];
 
 const stats = [
-  { value: "100%", label: "Cakupan semesta warga", accent: "text-primary-700" },
-  { value: "Rp 0", label: "Iuran ditanggung APBD", accent: "text-emerald-700" },
-  { value: "7", label: "Kecamatan di Kota Dumai", accent: "text-neutral-900" },
-  { value: "Resmi", label: "Program Pemerintah Kota", accent: "text-primary-700" },
+  { value: "100%", label: "Cakupan semesta warga" },
+  { value: "Rp 0", label: "Iuran ditanggung APBD" },
+  { value: "7", label: "Kecamatan terintegrasi" },
+  { value: "Resmi", label: "Program Pemko Dumai" },
 ];
 
 const advantages = [
   {
     icon: FileText,
+    label: "Layanan Utama",
     title: "Pendaftaran BPJS PBI Gratis",
     description:
-      "Ajukan pendaftaran secara online dan lengkapi data keluarga dalam satu portal.",
+      "Ajukan pendaftaran secara online dan lengkapi data satu Kartu Keluarga dalam satu akun tanpa biaya sepeser pun.",
     points: [
-      "Untuk warga Kota Dumai sesuai ketentuan program",
-      "Satu akun untuk data satu Kartu Keluarga",
-      "Tidak dipungut biaya pendaftaran",
+      "Khusus warga ber-KTP & KK Kota Dumai",
+      "Satu akun untuk seluruh anggota keluarga",
+      "100% bebas biaya pendaftaran & iuran bulanan",
     ],
     action: "Mulai pendaftaran",
     to: "/register",
   },
   {
     icon: Search,
-    title: "Pantau Status Pendaftaran",
+    label: "Transparansi",
+    title: "Pantau Status Real-Time",
     description:
-      "Lihat perkembangan pengajuan dengan NIK dan kode pendaftaran, tanpa harus masuk akun.",
+      "Cek perkembangan verifikasi berkas cukup menggunakan NIK dan kode pendaftaran tanpa perlu masuk akun.",
     points: [
-      "Informasi status pengajuan",
-      "Catatan verifikasi dari petugas",
-      "Bisa diakses kapan saja",
+      "Informasi progres verifikasi secara langsung",
+      "Catatan tindak lanjut dari petugas Dinkes",
+      "Dapat diakses kapan saja melalui ponsel",
     ],
-    action: "Cek status",
+    action: "Cek status pengajuan",
     to: "/cek-status",
   },
   {
     icon: Building2,
-    title: "Pilih Fasilitas Kesehatan",
+    label: "Jaringan Wilayah",
+    title: "Pilihan Puskesmas Terdekat",
     description:
-      "Tentukan Puskesmas atau Klinik Pratama tingkat pertama yang sesuai dengan domisili.",
+      "Tentukan lokasi Puskesmas yang sesuai dengan domisili tempat tinggal Anda di wilayah Kota Dumai.",
     points: [
-      "Pilihan faskes tingkat pertama",
-      "Sesuaikan dengan wilayah tempat tinggal",
-      "Data faskes diisi pada formulir",
+      "Terhubung dengan Puskesmas se-Kota Dumai",
+      "Penyesuaian lokasi berbasis kecamatan",
+      "Dipilih langsung saat pengisian formulir",
     ],
-    action: "Lihat alur",
+    action: "Lihat alur daftar",
     to: "#alur",
   },
 ];
@@ -87,56 +86,76 @@ const steps = [
     number: "01",
     title: "Siapkan NIK & Kartu Keluarga",
     description:
-      "Pastikan data kependudukan aktif dan sesuai dengan identitas warga Kota Dumai.",
-    note: "KK dan NIK peserta",
+      "Pastikan data kependudukan aktif dan tercatat sebagai warga Kota Dumai.",
+    note: "Dokumen KK & NIK aktif",
   },
   {
     number: "02",
-    title: "Isi formulir pendaftaran",
+    title: "Isi Formulir Online",
     description:
-      "Buat akun, lengkapi informasi keluarga, alamat, dan pilihan fasilitas kesehatan.",
-    note: "Proses online",
+      "Buat akun, lengkapi biodata anggota keluarga, alamat domisili, serta pilihan Puskesmas.",
+    note: "Pengisian ± 5 menit",
   },
   {
     number: "03",
-    title: "Pantau proses verifikasi",
+    title: "Pantau Hasil Verifikasi",
     description:
-      "Simpan kode pendaftaran dan gunakan bersama NIK untuk melihat status pengajuan.",
-    note: "Cek status kapan saja",
+      "Simpan kode pendaftaran yang muncul dan gunakan bersama NIK untuk melihat status kepesertaan.",
+    note: "Notifikasi & cek mandiri",
   },
 ];
 
 const facilities = [
-  { name: "Puskesmas Kota Dumai", district: "Dumai Kota" },
-  { name: "Puskesmas Jaya Mukti", district: "Dumai Timur" },
-  { name: "Puskesmas Bumi Ayu", district: "Dumai Selatan" },
-  { name: "Puskesmas Dumai Barat", district: "Dumai Barat" },
+  {
+    name: "Puskesmas Kota Dumai",
+    district: "Dumai Kota",
+    coverage:
+      "Pelayanan kesehatan umum, ibu & anak, serta rujukan terpadu wilayah pusat kota.",
+  },
+  {
+    name: "Puskesmas Jaya Mukti",
+    district: "Dumai Timur",
+    coverage:
+      "Melayani pemeriksaan dasar, imunisasi, dan administrasi kepesertaan wilayah Dumai Timur.",
+  },
+  {
+    name: "Puskesmas Bumi Ayu",
+    district: "Dumai Selatan",
+    coverage:
+      "Akses layanan kesehatan keluarga dan konsultasi medis bagi warga Dumai Selatan.",
+  },
+  {
+    name: "Puskesmas Dumai Barat",
+    district: "Dumai Barat",
+    coverage:
+      "Fasilitas pemeriksaan rawat jalan dan pelayanan kesehatan masyarakat Dumai Barat.",
+  },
 ];
 
 const commitments = [
   {
     icon: LockKeyhole,
-    title: "Data dijaga",
+    title: "Keamanan Data Warga",
     description:
-      "Informasi pendaftar digunakan untuk kebutuhan pengajuan dan verifikasi.",
+      "Seluruh data kependudukan dilindungi dan hanya digunakan untuk keperluan verifikasi jaminan kesehatan.",
   },
   {
     icon: HeartPulse,
-    title: "Layanan kesehatan",
+    title: "Akses Kesehatan Merata",
     description:
-      "Program membantu warga mengakses perlindungan kesehatan sesuai ketentuan.",
+      "Memastikan setiap warga Kota Dumai memperoleh perlindungan layanan medis yang layak.",
   },
   {
     icon: Smartphone,
-    title: "Akses lebih mudah",
+    title: "Layanan Tanpa Antre",
     description:
-      "Formulir pendaftaran dan cek status dapat diakses melalui ponsel maupun komputer.",
+      "Pengajuan dan pemantauan berkas dilakukan sepenuhnya secara daring dari mana saja.",
   },
   {
     icon: BadgeCheck,
-    title: "Proses tercatat",
+    title: "Alur Jelas & Tercatat",
     description:
-      "Kode pendaftaran membantu warga menelusuri status pengajuan dengan jelas.",
+      "Setiap permohonan memiliki kode registrasi unik untuk memudahkan penelusuran status.",
   },
 ];
 
@@ -144,22 +163,22 @@ const questions = [
   {
     question: "Siapa yang dapat mengajukan pendaftaran?",
     answer:
-      "Layanan ini ditujukan untuk warga Kota Dumai. Pengajuan akan diperiksa berdasarkan data dan ketentuan program yang berlaku.",
+      "Layanan ini ditujukan bagi warga Kota Dumai. Setiap pengajuan akan diverifikasi berdasarkan data kependudukan dan ketentuan program yang berlaku.",
   },
   {
     question: "Data dan dokumen apa yang perlu disiapkan?",
     answer:
-      "Siapkan NIK dan nomor Kartu Keluarga. Formulir akan memberi petunjuk dokumen yang perlu diunggah; Kartu Keluarga diperlukan untuk pengajuan.",
+      "Siapkan NIK dan nomor Kartu Keluarga (KK). Formulir pendaftaran akan memandu dokumen pendukung yang perlu diunggah.",
   },
   {
     question: "Bagaimana cara melihat status pendaftaran?",
     answer:
-      "Buka menu Cek Status, lalu masukkan NIK peserta dan kode pendaftaran yang diperoleh setelah mengirim formulir.",
+      "Buka halaman Cek Status, lalu masukkan NIK peserta beserta kode pendaftaran yang Anda peroleh setelah mengirim formulir.",
   },
   {
     question: "Berapa lama proses verifikasi berlangsung?",
     answer:
-      "Waktu verifikasi bergantung pada antrean dan kelengkapan data. Periksa status secara berkala untuk melihat pembaruan dari petugas.",
+      "Durasi verifikasi bergantung pada kelengkapan berkas dan antrean pengajuan. Anda dapat memeriksa pembaruannya secara berkala pada menu Cek Status.",
   },
 ];
 
@@ -168,10 +187,10 @@ function Reveal({ children, className = "", delay = 0 }) {
 
   return (
     <motion.div
-      initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 16 }}
       whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.16 }}
-      transition={{ duration: 0.55, delay, ease: EASE }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 0.5, delay, ease: EASE }}
       className={className}
     >
       {children}
@@ -179,511 +198,470 @@ function Reveal({ children, className = "", delay = 0 }) {
   );
 }
 
-function SectionHeading({ eyebrow, title, description, dark = false }) {
+/* Background Bergerak (Ken Burns Drift) */
+function MovingBackdrop({
+  image,
+  scrimClassName,
+  duration = 28,
+  reverse = false,
+}) {
+  const reduceMotion = useReducedMotion();
+
   return (
-    <div className="mx-auto mb-10 max-w-2xl text-center sm:mb-12">
-      <p
-        className={`mb-3 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] ${dark ? "text-emerald-300" : "text-primary-700"
-          }`}
-      >
-        <span className={`h-px w-5 ${dark ? "bg-emerald-400" : "bg-emerald-500"}`} />
-        {eyebrow}
-        <span className={`h-px w-5 ${dark ? "bg-emerald-400" : "bg-emerald-500"}`} />
-      </p>
-      <h2
-        className={`text-3xl font-bold leading-tight tracking-tight sm:text-4xl ${dark ? "text-white" : "text-neutral-900"
-          }`}
-      >
-        {title}
-      </h2>
-      <p
-        className={`mx-auto mt-3 max-w-xl text-sm leading-6 sm:text-base ${dark ? "text-white/75" : "text-neutral-600"
-          }`}
-      >
-        {description}
-      </p>
+    <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <motion.div
+        animate={
+          reduceMotion
+            ? undefined
+            : {
+                scale: [1, 1.08, 1.03, 1],
+                x: reverse ? ["0%", "2%", "-1.5%", "0%"] : ["0%", "-2%", "1.5%", "0%"],
+                y: reverse ? ["0%", "-1.2%", "0.8%", "0%"] : ["0%", "1.2%", "-0.8%", "0%"],
+              }
+        }
+        transition={{
+          duration,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute -inset-14 bg-cover bg-center"
+        style={{ backgroundImage: `url(${image})` }}
+      />
+      <div className={`absolute inset-0 backdrop-blur-[2px] ${scrimClassName}`} />
     </div>
   );
 }
 
 export default function LandingPage() {
   const { user } = useAuth();
-  const reduceMotion = useReducedMotion();
   const registrationPath = user ? "/register" : "/login";
 
+  const [selectedFacility, setSelectedFacility] = useState(0);
+  const [openFaq, setOpenFaq] = useState(0);
+
+  const featuredAdvantage = advantages[0];
+  const secondaryAdvantages = advantages.slice(1);
+  const FeaturedIcon = featuredAdvantage.icon;
+
   return (
-    <div className="overflow-hidden bg-neutral-50 text-neutral-900">
-      {/* ── Hero Banner dengan Moving Background (Puskesmas Kota Dumai / Morning Teal Gradient) ── */}
+    <div className="overflow-hidden bg-[#F7F6F2] text-slate-900 selection:bg-[#0F4C81]/15 selection:text-[#0F4C81]">
+      {/* ── 1. HERO SECTION (Editorial Split + Warm Alabaster & Coastal Blue) ── */}
       <section className="relative isolate overflow-hidden">
-        {/* Animated Moving Background — Ken Burns Cinematic Drift */}
-        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-          <motion.div
-            animate={
-              reduceMotion
-                ? undefined
-                : {
-                    scale: [1, 1.06, 1.03, 1],
-                    x: ["0%", "-1.5%", "1%", "0%"],
-                    y: ["0%", "1%", "-0.5%", "0%"],
-                  }
-            }
-            transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -inset-14 bg-cover bg-center"
-            style={{ backgroundImage: `url(${faskesBg})` }}
-          />
+        <MovingBackdrop
+          image={faskesBg}
+          duration={32}
+          scrimClassName="bg-gradient-to-br from-[#F7F6F2]/96 via-[#F4F2EC]/90 to-[#EAE7DF]/82"
+        />
 
-          {/* Fresh Morning Teal-Cream Scrim — light & airy */}
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary-50/96 via-[#edf9f7]/92 to-white/95 backdrop-blur-[3px]" />
-
-          {/* Subtle Ambient Dot Texture */}
-          <div className="absolute inset-0 bg-[radial-gradient(#0d6e6e_0.6px,transparent_1px)] [background-size:28px_28px] opacity-[0.08]" />
-        </div>
-
-        {/* Decorative orbs (kept from original) */}
-        <div className="pointer-events-none absolute -left-36 top-12 h-80 w-80 rounded-full bg-emerald-100/70 blur-3xl" />
-        <div className="pointer-events-none absolute -right-36 bottom-0 h-96 w-96 rounded-full bg-primary-100/60 blur-3xl" />
-
-        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 pb-20 pt-12 sm:px-6 sm:pb-24 sm:pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 lg:pt-20">
-          <div className="relative z-10">
-            <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary-100 bg-white/80 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-primary-800 shadow-sm sm:text-[11px]">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              Pemerintah Kota Dumai · Dinas Kesehatan
-            </p>
-
-            <h1 className="max-w-3xl text-[clamp(2.5rem,5vw,4.2rem)] font-extrabold leading-[1.04] tracking-[-0.045em] text-primary-950">
-              Program JKN BPJS Kesehatan Gratis Warga Kota Dumai.
-              <span className="mt-1 block text-primary-600">
-                100% Bebas Iuran APBD.
-              </span>
-            </h1>
-
-            <p className="mt-5 max-w-xl text-base leading-7 text-neutral-600 sm:text-lg">
-              Ajukan kepesertaan secara digital. Siapkan NIK dan nomor Kartu
-              Keluarga, lalu pantau status permohonan dari satu portal.
-            </p>
-
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link to={registrationPath} className="no-underline">
-                <span className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary-800 px-6 text-sm font-bold text-white shadow-lg shadow-primary-900/15 transition-colors hover:bg-primary-700 sm:w-auto">
-                  Ajukan pendaftaran gratis
-                  <ArrowRight className="h-4 w-4" />
+        <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-12 sm:px-6 sm:pb-24 sm:pt-20">
+          <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
+            {/* Kolom Kiri: Tipografi Tegas & Bersih */}
+            <div>
+              <h1 className="text-[clamp(2.45rem,4.7vw,3.95rem)] font-extrabold leading-[1.06] tracking-[-0.035em] text-slate-950">
+                Perlindungan Kesehatan Gratis Warga Dumai.{" "}
+                <span className="mt-1 block text-[#0F4C81]">
+                  100% Ditanggung APBD.
                 </span>
-              </Link>
-              <Link
-                to="/cek-status"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-800 no-underline transition-colors hover:border-primary-300 hover:bg-primary-50"
-              >
-                <Search className="h-4 w-4 text-primary-700" />
-                Cek status
-              </Link>
+              </h1>
+
+              <p className="mt-6 max-w-xl text-base leading-relaxed text-slate-600 sm:text-[17px]">
+                Daftarkan seluruh anggota keluarga dalam satu Kartu Keluarga
+                secara daring tanpa antre. Cukup siapkan NIK dan KK, lalu
+                pantau status verifikasi dari satu portal terpadu.
+              </p>
+
+              {/* Action Bar */}
+              <div className="mt-9 flex flex-col gap-3.5 sm:flex-row sm:items-center">
+                <Link
+                  to={registrationPath}
+                  className="group inline-flex h-13 items-center justify-center gap-3 rounded-xl bg-[#0A2540] px-7 py-3.5 text-sm font-semibold text-white shadow-sm no-underline transition-all hover:bg-[#0F4C81] active:scale-[0.99]"
+                >
+                  <span>Ajukan Pendaftaran</span>
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+
+                <Link
+                  to="/cek-status"
+                  className="inline-flex h-13 items-center justify-center gap-2.5 rounded-xl border border-slate-300/90 bg-white/80 px-6 py-3.5 text-sm font-semibold text-slate-800 no-underline backdrop-blur-sm transition-colors hover:border-[#0F4C81] hover:bg-white hover:text-[#0F4C81]"
+                >
+                  <Search className="h-4 w-4 text-[#0F4C81]" />
+                  <span>Cek Status Berkas</span>
+                </Link>
+              </div>
+
+              {/* Ringkasan Syarat Singkat */}
+              <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-medium text-slate-600">
+                {["Cukup NIK & KK", "Bebas Iuran Bulanan", "Proses Tercatat"].map(
+                  (item) => (
+                    <span key={item} className="inline-flex items-center gap-1.5">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-[#0F4C81]" />
+                      {item}
+                    </span>
+                  )
+                )}
+              </div>
             </div>
 
-            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 border-t border-neutral-200/80 pt-5 text-xs font-medium text-neutral-600">
-              {["NIK & KK", "Proses online", "Status transparan"].map((item) => (
-                <span key={item} className="inline-flex items-center gap-1.5">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-700" />
-                  {item}
-                </span>
+            {/* Kolom Kanan: Frame Editorial Tegak dengan Detail Coastal Navy */}
+            <Reveal className="relative mx-auto w-full max-w-[440px]">
+              <div className="overflow-hidden rounded-2xl bg-[#0A2540] text-white shadow-[0_24px_60px_-20px_rgba(10,37,64,0.28)]">
+                <div className="relative aspect-[4/3.8] w-full overflow-hidden">
+                  <img
+                    src={heroFamily}
+                    alt="Keluarga warga Kota Dumai di Puskesmas"
+                    className="h-full w-full object-cover object-center"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A2540] via-transparent to-transparent opacity-80" />
+                </div>
+
+                <div className="px-6 pb-6 pt-2">
+                  <div className="flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#E0A96D]">
+                    <span>Universal Health Coverage</span>
+                    <span>Kota Dumai</span>
+                  </div>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-200">
+                    Jaminan layanan kesehatan aktif untuk seluruh anggota
+                    keluarga warga Kota Dumai melalui dukungan APBD.
+                  </p>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+
+          {/* Metrics Strip Terbuka */}
+          <div className="mt-16 border-t border-slate-900/10 pt-8 sm:mt-20">
+            <div className="grid grid-cols-2 gap-y-6 sm:grid-cols-4 sm:divide-x sm:divide-slate-900/10">
+              {stats.map((item, idx) => (
+                <div
+                  key={item.label}
+                  className={idx === 0 ? "sm:pr-6" : "sm:px-6"}
+                >
+                  <p className="text-2xl font-extrabold tracking-tight text-slate-950 tabular-nums sm:text-3xl">
+                    {item.value}
+                  </p>
+                  <p className="mt-1 text-xs font-medium text-slate-600">
+                    {item.label}
+                  </p>
+                </div>
               ))}
             </div>
           </div>
+        </div>
+      </section>
 
-          <Reveal className="relative mx-auto w-full max-w-[540px]">
-            {/* Ambient Background Glow */}
-            <div className="pointer-events-none absolute inset-4 rounded-[2.5rem] bg-gradient-to-tr from-emerald-400/25 via-primary-300/20 to-teal-200/20 blur-2xl" />
+      {/* ── 2. KEUNGGULAN PROGRAM (Asymmetric Bento Layout) ── */}
+      <section className="relative isolate overflow-hidden py-20 sm:py-28">
+        <MovingBackdrop
+          image={advantagesBg}
+          duration={26}
+          reverse
+          scrimClassName="bg-gradient-to-b from-white/95 via-[#FAF9F6]/90 to-white/95"
+        />
 
-            {/* Main Editorial Image Card */}
-            <div className="group relative overflow-hidden rounded-[2rem] border border-neutral-200/80 bg-white p-2 shadow-[0_30px_70px_-25px_rgba(4,63,63,0.22)] transition-all duration-500 hover:shadow-[0_35px_80px_-20px_rgba(4,63,63,0.3)]">
-              {/* Image Container with Ambient Scrim */}
-              <div className="relative aspect-[4/3.2] w-full overflow-hidden rounded-[1.6rem] bg-neutral-100 sm:aspect-[4/3.3]">
-                <img
-                  src={heroFamily}
-                  alt="Keluarga warga Kota Dumai di Puskesmas Ramah Keluarga"
-                  className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                />
-
-                {/* Editorial Gradient Scrim for readable badges and text */}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-neutral-950/85 via-neutral-950/25 to-neutral-950/10" />
-
-                {/* Top Badge: Floating Status Pill */}
-                <div className="absolute left-3.5 top-3.5 sm:left-4 sm:top-4 inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/90 px-3 py-1.5 text-[11px] font-bold text-neutral-800 shadow-md backdrop-blur-md">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-                  </span>
-                  Layanan Faskes Ramah Keluarga
-                </div>
-
-                {/* Top Right: Dinas Kesehatan Seal Pill */}
-                <div className="absolute right-3.5 top-3.5 sm:right-4 sm:top-4 flex items-center gap-2 rounded-full border border-white/20 bg-neutral-900/70 p-1 pl-2.5 text-[10px] font-semibold tracking-wider text-white shadow-md backdrop-blur-md">
-                  <span className="hidden xs:inline uppercase">Kota Dumai</span>
-                  <img
-                    src={logoDinkes}
-                    alt="Logo Dinas Kesehatan Kota Dumai"
-                    className="h-6 w-6 rounded-full border border-white/30 object-cover"
-                  />
-                </div>
-
-                {/* Bottom Overlay Text */}
-                <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 text-white">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-300">
-                    Jaminan Kesehatan Semesta (UHC)
-                  </p>
-                  <h3 className="mt-1 text-lg font-bold leading-snug sm:text-xl text-white">
-                    Perlindungan kesehatan aktif untuk seluruh anggota keluarga.
-                  </h3>
-                  <p className="mt-1 hidden sm:block text-xs leading-relaxed text-white/80">
-                    Terhubung langsung dengan fasilitas kesehatan tingkat pertama di 7 kecamatan Kota Dumai.
-                  </p>
-                </div>
-              </div>
-
-              {/* Bottom Micro Metric Bar */}
-              <div className="grid grid-cols-2 gap-2 p-2 pt-3">
-                <div className="flex items-center gap-2.5 rounded-xl border border-neutral-100 bg-neutral-50/80 p-2.5 sm:p-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
-                    <CreditCard className="h-4 w-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold text-neutral-900 leading-tight">Rp 0 Bebas Iuran</p>
-                    <p className="text-[10px] text-neutral-500 leading-tight truncate">Ditanggung APBD</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2.5 rounded-xl border border-neutral-100 bg-neutral-50/80 p-2.5 sm:p-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-100 text-primary-800">
-                    <UsersRound className="h-4 w-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold text-neutral-900 leading-tight">1 Akun = 1 KK</p>
-                    <p className="text-[10px] text-neutral-500 leading-tight truncate">Daftarkan sekeluarga</p>
-                  </div>
-                </div>
-              </div>
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div className="max-w-xl">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#0F4C81]">
+                Keunggulan Layanan
+              </p>
+              <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
+                Dirancang sederhana, cepat, dan mudah diakses warga.
+              </h2>
             </div>
-
-
-          </Reveal>
-        </div>
-
-        {/* Stats cards — INSIDE hero section so background continues behind them */}
-        <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-2 gap-3 px-4 pb-10 sm:grid-cols-4 sm:gap-4 sm:px-6 sm:pb-14">
-          {stats.map((item, index) => (
-            <Reveal key={item.label} delay={index * 0.04}>
-              <div className="h-full rounded-2xl border border-white/60 bg-white/85 p-4 shadow-[0_8px_24px_-20px_rgba(15,23,42,0.35)] backdrop-blur-md sm:p-5">
-                <p className={`text-2xl font-extrabold tracking-tight sm:text-3xl ${item.accent}`}>
-                  {item.value}
-                </p>
-                <p className="mt-1 text-[11px] leading-4 text-neutral-500 sm:text-xs">
-                  {item.label}
-                </p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      {/* ── 3 Keunggulan BPJS Dumai dengan Background Gambar Bergerak (Ken Burns Drift) ── */}
-      <section className="relative isolate overflow-hidden border-y border-emerald-950/[0.08] py-20 sm:py-28">
-        {/* Animated Moving Background Image */}
-        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-          <motion.div
-            animate={
-              reduceMotion
-                ? undefined
-                : {
-                  scale: [1, 1.08, 1.03, 1],
-                  x: ["0%", "-2.5%", "1.5%", "0%"],
-                  y: ["0%", "-1.5%", "0.8%", "0%"],
-                }
-            }
-            transition={{
-              duration: 26,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            className="absolute -inset-14 bg-cover bg-center"
-            style={{ backgroundImage: `url(${advantagesBg})` }}
-          />
-
-          {/* Frosted Glass Overlay Scrim for 100% Readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-white/95 via-white/88 to-white/95 backdrop-blur-[3px]" />
-
-          {/* Subtle Ambient Radial Dots Pattern */}
-          <div className="absolute inset-0 bg-[radial-gradient(#059669_0.75px,transparent_1px)] [background-size:24px_24px] opacity-[0.14]" />
-        </div>
-
-        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
-          <SectionHeading
-            eyebrow="Program prioritas Pemko Dumai"
-            title="3 keunggulan BPJS Gratis Kota Dumai"
-            description="Layanan yang dirancang agar pengajuan lebih mudah dipahami, status lebih mudah dipantau, dan pilihan faskes lebih dekat dengan warga."
-          />
-
-          <div className="grid gap-5 md:grid-cols-3">
-            {advantages.map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <Reveal key={item.title} delay={index * 0.06}>
-                  <article className="group flex h-full flex-col rounded-2xl border border-white/80 bg-white/92 p-6 shadow-[0_10px_30px_-15px_rgba(4,63,63,0.12)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1.5 hover:border-emerald-300/80 hover:bg-white hover:shadow-[0_20px_40px_-15px_rgba(4,63,63,0.18)] sm:p-7">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary-100 text-primary-700 transition-all duration-300 group-hover:scale-110 group-hover:bg-primary-700 group-hover:text-white">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <h3 className="mt-5 text-lg font-bold tracking-tight text-neutral-900">
-                      {item.title}
-                    </h3>
-                    <p className="mt-2 text-sm leading-6 text-neutral-600">
-                      {item.description}
-                    </p>
-                    <ul className="mt-5 space-y-2.5 border-t border-neutral-100 pt-4">
-                      {item.points.map((point) => (
-                        <li
-                          key={point}
-                          className="flex items-start gap-2 text-xs leading-5 text-neutral-600"
-                        >
-                          <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-700" />
-                          {point}
-                        </li>
-                      ))}
-                    </ul>
-                    <Link
-                      to={item.to}
-                      className="mt-auto inline-flex items-center gap-1.5 pt-6 text-xs font-bold text-primary-700 no-underline transition-colors hover:text-emerald-700"
-                    >
-                      {item.action}
-                      <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                    </Link>
-                  </article>
-                </Reveal>
-              );
-            })}
+            <p className="max-w-sm text-sm leading-relaxed text-slate-600">
+              Seluruh tahapan pendaftaran hingga pengecekan status terintegrasi
+              dalam satu layanan digital.
+            </p>
           </div>
-        </div>
-      </section>
 
-      {/* ── Syarat & Alur Pendaftaran dengan Moving Background Berwarna Berbeda (Deep Midnight Emerald Glass) ── */}
-      <section id="alur" className="relative isolate overflow-hidden border-y border-white/10 bg-[#032321] py-20 sm:py-28">
-        {/* Animated Moving Background Image (Ken Burns Drift) */}
-        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-          <motion.div
-            animate={
-              reduceMotion
-                ? undefined
-                : {
-                  scale: [1, 1.09, 1.04, 1],
-                  x: ["0%", "2.5%", "-1.5%", "0%"],
-                  y: ["0%", "-1.8%", "0.8%", "0%"],
-                }
-            }
-            transition={{
-              duration: 28,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            className="absolute -inset-14 bg-cover bg-center"
-            style={{ backgroundImage: `url(${alurBg})` }}
-          />
-
-          {/* Deep Midnight Teal / Emerald Atmosphere Scrim */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#021d1b]/95 via-[#032924]/88 to-[#021816]/96 backdrop-blur-[3px]" />
-
-          {/* Subtle Ambient Radial Dots Pattern */}
-          <div className="absolute inset-0 bg-[radial-gradient(#34d399_0.75px,transparent_1px)] [background-size:24px_24px] opacity-[0.14]" />
-        </div>
-
-        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
-          <SectionHeading
-            dark
-            eyebrow="Syarat & alur pendaftaran"
-            title="Hanya 3 langkah mudah"
-            description="Ikuti tahapannya dari menyiapkan data sampai memeriksa hasil verifikasi."
-          />
-
-          <div className="grid gap-5 md:grid-cols-3">
-            {steps.map((step, index) => (
-              <Reveal key={step.number} delay={index * 0.08}>
-                <article className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-white/15 bg-white/[0.08] p-6 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:border-emerald-400/50 hover:bg-white/[0.13] sm:p-7">
-                  {/* Subtle Top Inner Highlight */}
-                  <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <span
-                        className={`flex h-11 w-11 items-center justify-center rounded-2xl text-sm font-extrabold shadow-md transition-transform duration-300 group-hover:scale-105 ${index === 1
-                          ? "bg-emerald-400 text-[#02241e] shadow-emerald-400/30"
-                          : "border border-white/20 bg-white/10 text-emerald-200"
-                          }`}
-                      >
-                        {step.number}
-                      </span>
-                      <span className="rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-300/90 backdrop-blur-xs">
-                        Tahap {index + 1}
-                      </span>
+          {/* Bento Grid: 1 Kartu Utama Besar di Kiri + 2 Kartu Pendukung di Kanan */}
+          <div className="mt-12 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+            {/* Kartu Utama (Coastal Navy) */}
+            <Reveal>
+              <article className="group flex h-full flex-col justify-between rounded-2xl bg-[#0A2540] p-7 text-white shadow-sm sm:p-9">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 text-[#E0A96D]">
+                      <FeaturedIcon className="h-5 w-5" />
                     </div>
-
-                    <h3 className="mt-6 text-xl font-bold leading-snug tracking-tight text-white">
-                      {step.title}
-                    </h3>
-                    <p className="mt-2.5 text-sm leading-6 text-white/75">
-                      {step.description}
-                    </p>
-                  </div>
-
-                  <div className="mt-6 border-t border-white/10 pt-4">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-950/60 px-3 py-1.5 text-[11px] font-semibold text-emerald-300 shadow-sm">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                      {step.note}
+                    <span className="rounded-md bg-white/10 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-slate-200">
+                      {featuredAdvantage.label}
                     </span>
                   </div>
-                </article>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* ── Jejaring Fasilitas Kesehatan dengan Moving Background Berwarna Berbeda (Crystalline Aqua Fog) ── */}
-      <section className="relative isolate overflow-hidden border-b border-teal-900/10 bg-[#eef7f8] py-20 sm:py-28">
-        {/* Animated Moving Background Image (Ken Burns Drift) */}
-        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-          <motion.div
-            animate={
-              reduceMotion
-                ? undefined
-                : {
-                  scale: [1, 1.07, 1.03, 1],
-                  x: ["0%", "-2%", "1%", "0%"],
-                  y: ["0%", "1.5%", "-0.8%", "0%"],
-                }
-            }
-            transition={{
-              duration: 27,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            className="absolute -inset-14 bg-cover bg-center"
-            style={{ backgroundImage: `url(${faskesBg})` }}
-          />
+                  <h3 className="mt-7 text-2xl font-bold tracking-tight text-white">
+                    {featuredAdvantage.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-300 sm:text-base">
+                    {featuredAdvantage.description}
+                  </p>
 
-          {/* Fresh Crystalline Aqua / Cerulean Fog Overlay Scrim */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#eaf5f6]/94 via-[#dff1f2]/88 to-[#ebf7f6]/95 backdrop-blur-[3px]" />
+                  <ul className="mt-7 space-y-3 border-t border-white/10 pt-6">
+                    {featuredAdvantage.points.map((point) => (
+                      <li
+                        key={point}
+                        className="flex items-start gap-2.5 text-xs leading-5 text-slate-200 sm:text-sm"
+                      >
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#E0A96D]" />
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
 
-          {/* Subtle Ambient Radial Dots Pattern */}
-          <div className="absolute inset-0 bg-[radial-gradient(#0891b2_0.75px,transparent_1px)] [background-size:24px_24px] opacity-[0.14]" />
-        </div>
+                <Link
+                  to={featuredAdvantage.to}
+                  className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-[#E0A96D] no-underline transition-colors hover:text-white"
+                >
+                  <span>{featuredAdvantage.action}</span>
+                  <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </Link>
+              </article>
+            </Reveal>
 
-        <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr]">
-          <Reveal>
-            <div>
-              <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-teal-200/80 bg-white/90 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-teal-800 shadow-xs backdrop-blur-md">
-                <MapPin className="h-4 w-4 text-teal-600" />
-                Jejaring pelayanan Kota Dumai
-              </p>
-              <h2 className="text-3xl font-extrabold leading-tight tracking-tight text-neutral-900 sm:text-4xl">
-                Faskes tingkat pertama, lebih dekat dengan domisili.
-              </h2>
-              <p className="mt-4 text-sm leading-7 text-neutral-700 sm:text-base">
-                Pilih Puskesmas yang sesuai dengan wilayah tempat tinggal saat
-                mengisi formulir pendaftaran. Terhubung dengan 7 kecamatan di
-                Kota Dumai.
-              </p>
-              <Link
-                to={registrationPath}
-                className="mt-7 inline-flex h-12 items-center gap-2.5 rounded-xl bg-teal-800 px-6 text-sm font-bold text-white shadow-lg shadow-teal-950/20 no-underline transition-all duration-200 hover:bg-teal-700 hover:scale-[1.02] active:scale-95"
-              >
-                Pilih faskes saat daftar
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+            {/* 2 Kartu Pendukung Bertumpuk */}
+            <div className="flex flex-col gap-6">
+              {secondaryAdvantages.map((item, idx) => {
+                const Icon = item.icon;
+                return (
+                  <Reveal key={item.title} delay={(idx + 1) * 0.08}>
+                    <article className="group flex h-full flex-col justify-between rounded-2xl border border-slate-200/80 bg-white/92 p-6 backdrop-blur-md transition-all duration-300 hover:border-[#0F4C81]/40 hover:bg-white sm:p-7">
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0F4C81]/10 text-[#0F4C81] transition-colors group-hover:bg-[#0F4C81] group-hover:text-white">
+                            <Icon className="h-5 w-5" />
+                          </div>
+                          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                            {item.label}
+                          </span>
+                        </div>
+
+                        <h3 className="mt-4 text-lg font-bold tracking-tight text-slate-950">
+                          {item.title}
+                        </h3>
+                        <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                          {item.description}
+                        </p>
+                      </div>
+
+                      <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
+                        <span className="text-xs text-slate-500">
+                          {item.points[0]}
+                        </span>
+                        <Link
+                          to={item.to}
+                          className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-[#0F4C81] no-underline hover:text-[#0A2540]"
+                        >
+                          <span>{item.action}</span>
+                          <ArrowUpRight className="h-3.5 w-3.5" />
+                        </Link>
+                      </div>
+                    </article>
+                  </Reveal>
+                );
+              })}
             </div>
-          </Reveal>
-
-          <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-            {facilities.map((facility, index) => (
-              <Reveal key={facility.name} delay={index * 0.05}>
-                <article className="group flex h-full min-h-28 items-center gap-4 rounded-2xl border border-white/80 bg-white/88 p-4.5 shadow-[0_10px_30px_-15px_rgba(8,145,178,0.12)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-teal-300 hover:bg-white hover:shadow-[0_20px_40px_-15px_rgba(8,145,178,0.2)]">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-teal-100 bg-teal-50 text-teal-700 transition-all duration-300 group-hover:scale-110 group-hover:bg-teal-700 group-hover:text-white">
-                    <Building2 className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-teal-700">
-                      Faskes tingkat I
-                    </p>
-                    <h3 className="mt-1 text-sm font-bold text-neutral-900">
-                      {facility.name}
-                    </h3>
-                    <p className="mt-0.5 text-xs text-neutral-600">
-                      Kecamatan {facility.district}
-                    </p>
-                  </div>
-                </article>
-              </Reveal>
-            ))}
           </div>
         </div>
       </section>
 
-      {/* ── Komitmen Pemko Dumai dengan Moving Background (Warm Amber Dusk / Dumai Waterfront Aerial) ── */}
-      <section className="relative isolate overflow-hidden border-t border-amber-900/10 py-20 sm:py-28">
-        {/* Animated Moving Background — Ken Burns Cinematic Drift */}
-        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-          <motion.div
-            animate={
-              reduceMotion
-                ? undefined
-                : {
-                  scale: [1, 1.08, 1.04, 1],
-                  x: ["0%", "2%", "-1.5%", "0%"],
-                  y: ["0%", "1.2%", "-1%", "0%"],
-                }
-            }
-            transition={{
-              duration: 30,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            className="absolute -inset-14 bg-cover bg-center"
-            style={{ backgroundImage: `url(${komitmenBg})` }}
-          />
-
-          {/* Warm Amber Dusk Scrim — distinct from teal/emerald sections */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#1a0e05]/88 via-[#2d1a06]/80 to-[#1a0d04]/90 backdrop-blur-[3px]" />
-
-          {/* Subtle Gold Radial Dot Texture */}
-          <div className="absolute inset-0 bg-[radial-gradient(#f59e0b_0.75px,transparent_1px)] [background-size:24px_24px] opacity-[0.10]" />
-        </div>
+      {/* ── 3. ALUR PENDAFTARAN (Clean Architectural Steps di atas Deep Navy) ── */}
+      <section
+        id="alur"
+        className="relative isolate overflow-hidden bg-[#081C2E] py-20 text-white sm:py-28"
+      >
+        <MovingBackdrop
+          image={alurBg}
+          duration={28}
+          scrimClassName="bg-gradient-to-b from-[#071828]/94 via-[#0A2540]/88 to-[#071828]/95"
+        />
 
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
-          <SectionHeading
-            dark
-            eyebrow="Komitmen Pemko Dumai"
-            title="Perlindungan yang terasa manfaatnya"
-            description="Informasi layanan, langkah pengajuan, dan tindak lanjut disajikan dalam satu tempat."
-          />
+          <div className="max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#E0A96D]">
+              Alur Pendaftaran
+            </p>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+              Tiga langkah menuju perlindungan kesehatan.
+            </h2>
+          </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-14 grid gap-10 border-t border-white/15 pt-12 md:grid-cols-3 md:gap-8">
+            {steps.map((step, index) => (
+              <Reveal key={step.number} delay={index * 0.08}>
+                <div className="relative">
+                  <span className="font-mono text-3xl font-extrabold tracking-tight text-[#E0A96D] tabular-nums">
+                    {step.number}
+                  </span>
+
+                  <h3 className="mt-4 text-lg font-bold text-white">
+                    {step.title}
+                  </h3>
+                  <p className="mt-2.5 text-sm leading-relaxed text-slate-300">
+                    {step.description}
+                  </p>
+                  <p className="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold text-slate-200">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-[#E0A96D]" />
+                    {step.note}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 4. JEJARING PUSKESMAS (Interactive Split Directory) ── */}
+      <section className="relative isolate overflow-hidden bg-[#F7F6F2] py-20 sm:py-28">
+        <MovingBackdrop
+          image={faskesBg}
+          duration={27}
+          reverse
+          scrimClassName="bg-gradient-to-br from-[#F7F6F2]/95 via-[#F2F0EA]/88 to-[#EBE8DF]/94"
+        />
+
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#0F4C81]">
+              Jejaring Pelayanan Kota Dumai
+            </p>
+            <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-slate-950 sm:text-4xl">
+              Layanan Puskesmas, lebih dekat dengan domisili.
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">
+              Pilih salah satu lokasi Puskesmas di bawah untuk melihat cakupan
+              layanan sebelum mengisi formulir pendaftaran.
+            </p>
+          </div>
+
+          <div className="mt-12 grid items-start gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+            {/* Daftar Interaktif Puskesmas */}
+            <div className="divide-y divide-slate-900/10 border-y border-slate-900/10">
+              {facilities.map((facility, index) => {
+                const isSelected = selectedFacility === index;
+                return (
+                  <button
+                    key={facility.name}
+                    type="button"
+                    onClick={() => setSelectedFacility(index)}
+                    className={`flex w-full items-center justify-between gap-4 px-4 py-5 text-left transition-colors ${
+                      isSelected
+                        ? "bg-white/90 text-slate-950"
+                        : "text-slate-800 hover:bg-white/50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <span
+                        className={`font-mono text-xs font-bold tabular-nums ${
+                          isSelected ? "text-[#0F4C81]" : "text-slate-400"
+                        }`}
+                      >
+                        0{index + 1}
+                      </span>
+                      <div>
+                        <p className="text-base font-bold">{facility.name}</p>
+                        <p className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500">
+                          <MapPin className="h-3.5 w-3.5 text-[#0F4C81]" />
+                          Kecamatan {facility.district}
+                        </p>
+                      </div>
+                    </div>
+
+                    <ArrowRight
+                      className={`h-4 w-4 shrink-0 transition-transform ${
+                        isSelected
+                          ? "translate-x-0 text-[#0F4C81]"
+                          : "-translate-x-1 text-slate-300"
+                      }`}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Panel Detail Puskesmas Terpilih */}
+            <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-7 shadow-[0_14px_34px_-18px_rgba(15,23,42,0.12)] backdrop-blur-md sm:p-8">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={selectedFacility}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.22, ease: EASE }}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex items-center gap-1.5 rounded-md bg-[#0F4C81]/10 px-2.5 py-1 text-xs font-bold text-[#0F4C81]">
+                      <Building2 className="h-3.5 w-3.5" />
+                      Puskesmas Terdaftar
+                    </span>
+                    <span className="text-xs font-medium text-emerald-700">
+                      ● Terhubung 7 Kecamatan
+                    </span>
+                  </div>
+
+                  <h3 className="mt-5 text-2xl font-bold text-slate-950">
+                    {facilities[selectedFacility].name}
+                  </h3>
+                  <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Wilayah Kecamatan {facilities[selectedFacility].district}
+                  </p>
+
+                  <p className="mt-4 text-sm leading-relaxed text-slate-600">
+                    {facilities[selectedFacility].coverage}
+                  </p>
+
+                  <div className="mt-7 border-t border-slate-100 pt-6">
+                    <Link
+                      to={registrationPath}
+                      className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#0A2540] px-5 text-xs font-bold uppercase tracking-wider text-white no-underline transition-colors hover:bg-[#0F4C81]"
+                    >
+                      <span>Pilih Puskesmas Ini saat Daftar</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 5. KOMITMEN PEMKO DUMAI ── */}
+      <section className="relative isolate overflow-hidden bg-[#12161B] py-20 text-white sm:py-28">
+        <MovingBackdrop
+          image={komitmenBg}
+          duration={30}
+          scrimClassName="bg-gradient-to-b from-[#101419]/92 via-[#151B22]/86 to-[#101419]/94"
+        />
+
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#E0A96D]">
+              Komitmen Pemerintah Kota
+            </p>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+              Pelayanan publik yang transparan dan berpihak pada warga.
+            </h2>
+          </div>
+
+          <div className="mt-14 grid gap-x-12 gap-y-10 border-t border-white/15 pt-12 sm:grid-cols-2">
             {commitments.map((item, index) => {
               const Icon = item.icon;
               return (
-                <Reveal key={item.title} delay={index * 0.06}>
-                  <article className="group relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.07] p-5 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:border-amber-400/40 hover:bg-white/[0.12] sm:p-6">
-                    {/* Top inner glow */}
-                    <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/30 to-transparent" />
-
-                    {/* Left accent bar */}
-                    <div className="absolute inset-y-4 left-0 w-[3px] rounded-full bg-gradient-to-b from-amber-400 via-amber-300 to-amber-500/50" />
-
-                    <div className="pl-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-500/10 text-amber-300 transition-all duration-300 group-hover:scale-110 group-hover:bg-amber-500/20">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <h3 className="mt-4 text-sm font-bold text-white">
+                <Reveal key={item.title} delay={index * 0.05}>
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-white/5 text-[#E0A96D]">
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-white">
                         {item.title}
                       </h3>
-                      <p className="mt-2 text-xs leading-5 text-white/70">
+                      <p className="mt-1.5 text-sm leading-relaxed text-slate-300">
                         {item.description}
                       </p>
                     </div>
-                  </article>
+                  </div>
                 </Reveal>
               );
             })}
@@ -691,104 +669,104 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── FAQ + CTA Bantuan — (Deep Oceanic Twilight Petrol / FAQ Dumai) ── */}
-      <section className="relative isolate overflow-hidden bg-[#08222b] pb-16 pt-20 sm:pb-24 sm:pt-28">
-        {/* Animated Moving Background — Ken Burns Cinematic Drift */}
-        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-          <motion.div
-            animate={
-              reduceMotion
-                ? undefined
-                : {
-                    scale: [1, 1.08, 1.04, 1],
-                    x: ["0%", "-2%", "1.5%", "0%"],
-                    y: ["0%", "1.5%", "-1%", "0%"],
-                  }
-            }
-            transition={{ duration: 32, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -inset-14 bg-cover bg-center"
-            style={{ backgroundImage: `url(${faqBg})` }}
-          />
+      {/* ── 6. FAQ (2-Column Split) & POSKO BANTUAN ── */}
+      <section className="relative isolate overflow-hidden bg-[#0A2540] py-20 text-white sm:py-28">
+        <MovingBackdrop
+          image={faqBg}
+          duration={32}
+          reverse
+          scrimClassName="bg-gradient-to-b from-[#081E34]/94 via-[#0B2947]/86 to-[#081E34]/95"
+        />
 
-          {/* Deep Oceanic Petrol Teal Scrim — distinct & more luminous than the dark footer */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#061e26]/92 via-[#0b333f]/84 to-[#072029]/94 backdrop-blur-[3px]" />
-
-          {/* Fine Cyan/Aqua Dot Texture */}
-          <div className="absolute inset-0 bg-[radial-gradient(#38bdf8_0.65px,transparent_1px)] [background-size:24px_24px] opacity-[0.10]" />
-
-          {/* Subtle Ambient Glow Orbs */}
-          <div className="pointer-events-none absolute -left-20 top-1/4 h-80 w-80 rounded-full bg-cyan-500/15 blur-3xl" />
-          <div className="pointer-events-none absolute -right-20 bottom-1/4 h-80 w-80 rounded-full bg-teal-400/15 blur-3xl" />
-        </div>
-
-        {/* ─── FAQ Area ─── */}
-        <div className="relative mx-auto max-w-4xl px-4 sm:px-6">
-          <SectionHeading
-            dark
-            eyebrow="Tanya jawab seputar BPJS Dumai"
-            title="Pertanyaan yang sering diajukan"
-            description="Temukan jawaban singkat tentang pengajuan dan cara memeriksa status."
-          />
-          <div className="space-y-3">
-            {questions.map((item) => (
-              <details
-                key={item.question}
-                className="group rounded-2xl border border-white/10 bg-white/[0.07] px-5 shadow-[0_8px_24px_-10px_rgba(0,0,0,0.4)] backdrop-blur-xl transition-all duration-200 hover:border-cyan-400/30 open:border-cyan-400/40 open:bg-white/[0.11]"
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-sm font-semibold text-white marker:content-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent [&::-webkit-details-marker]:hidden">
-                  {item.question}
-                  <ChevronDown className="h-4 w-4 shrink-0 text-cyan-300 transition-transform duration-300 group-open:rotate-180" />
-                </summary>
-                <p className="max-w-3xl pb-5 pr-8 text-sm leading-6 text-white/75">
-                  {item.answer}
-                </p>
-              </details>
-            ))}
-          </div>
-        </div>
-
-        {/* ─── Divider ─── */}
-        <div className="mx-auto my-16 max-w-6xl px-4 sm:my-20 sm:px-6">
-          <div className="h-px bg-gradient-to-r from-transparent via-cyan-400/35 to-transparent" />
-        </div>
-
-        {/* ─── CTA Bantuan ─── */}
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="relative overflow-hidden rounded-[2.5rem] border border-white/[0.12] bg-white/[0.06] px-6 py-12 shadow-2xl backdrop-blur-md sm:px-10 sm:py-14 lg:px-14">
-            {/* Decorative orbs */}
-            <div className="pointer-events-none absolute -right-20 -top-24 h-80 w-80 rounded-full border-[48px] border-white/[0.04]" />
-            <div className="pointer-events-none absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-emerald-500/20 blur-3xl" />
-            <div className="pointer-events-none absolute -left-16 top-1/2 h-56 w-56 -translate-y-1/2 rounded-full bg-cyan-400/15 blur-3xl" />
+          {/* FAQ Split 2 Kolom */}
+          <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr]">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#E0A96D]">
+                Tanya Jawab
+              </p>
+              <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                Pertanyaan yang sering diajukan.
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-slate-300">
+                Informasi ringkas seputar persyaratan dokumen, alur pendaftaran,
+                dan cara mengecek status pengajuan.
+              </p>
+            </div>
 
-            <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-              <div className="max-w-2xl text-white">
-                <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-white/10 px-3 py-1 text-[11px] font-semibold text-cyan-200 backdrop-blur-sm">
-                  <ShieldCheck className="h-3.5 w-3.5" />
-                  Layanan Bantuan &amp; Posko Pengaduan Dumai
+            <div className="divide-y divide-white/15 border-y border-white/15">
+              {questions.map((item, idx) => {
+                const isOpen = openFaq === idx;
+                return (
+                  <div key={item.question} className="py-5">
+                    <button
+                      type="button"
+                      onClick={() => setOpenFaq(isOpen ? -1 : idx)}
+                      className="flex w-full items-center justify-between gap-4 text-left text-base font-semibold text-white transition-colors hover:text-[#E0A96D]"
+                    >
+                      <span>{item.question}</span>
+                      <ChevronDown
+                        className={`h-4 w-4 shrink-0 text-[#E0A96D] transition-transform duration-200 ${
+                          isOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+
+                    <AnimatePresence initial={false}>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25, ease: EASE }}
+                          className="overflow-hidden"
+                        >
+                          <p className="pt-3 pr-8 text-sm leading-relaxed text-slate-300">
+                            {item.answer}
+                          </p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 1 Fokus CTA Card Posko Bantuan */}
+          <div className="mt-20 rounded-2xl border border-white/15 bg-white/[0.06] p-8 backdrop-blur-xl sm:mt-24 sm:p-12">
+            <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-center">
+              <div className="max-w-xl">
+                <p className="mb-3 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-[#E0A96D]">
+                  <ShieldCheck className="h-4 w-4" />
+                  <span>Posko Layanan & Pengaduan</span>
                 </p>
-                <h2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl text-white">
-                  Butuh Bantuan Pendaftaran BPJS Dumai?
+                <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+                  Butuh bantuan pendaftaran BPJS Dumai?
                 </h2>
-                <p className="mt-3 max-w-xl text-sm leading-6 text-white/70 sm:text-base">
-                  Hubungi petugas Posko Layanan BPJS Kesehatan Kota Dumai melalui WhatsApp atau layanan Call Center tanggap cepat.
+                <p className="mt-2.5 text-sm leading-relaxed text-slate-300">
+                  Hubungi petugas Posko Layanan Dinas Kesehatan Kota Dumai
+                  melalui WhatsApp resmi atau Call Center tanggap cepat.
                 </p>
               </div>
-              <div className="flex flex-col gap-3.5 w-full sm:w-auto">
+
+              <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
                 <a
                   href="https://wa.me/6281275000000?text=Halo%20Admin%20Posko%20BPJS%20Dinas%20Kesehatan%20Kota%20Dumai,%20saya%20ingin%20bertanya%20seputar%20pendaftaran"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-[52px] w-full items-center justify-center gap-3 rounded-full bg-[#4ee4a5] px-7 text-[15px] font-bold tracking-tight text-[#063328] shadow-lg shadow-emerald-950/20 no-underline transition-all duration-200 hover:bg-[#42d997] hover:scale-[1.02] active:scale-95 sm:min-w-[320px]"
+                  className="inline-flex h-12 items-center justify-center gap-2.5 rounded-xl bg-[#E0A96D] px-6 text-sm font-bold text-[#0A2540] no-underline transition-colors hover:bg-[#e8b882] active:scale-[0.99]"
                 >
-                  <MessageSquareText className="h-[21px] w-[21px] stroke-[2.2] text-[#063328]" />
-                  <span>WhatsApp Posko Dumai</span>
+                  <MessageSquareText className="h-4 w-4" />
+                  <span>WhatsApp Posko</span>
                 </a>
+
                 <a
                   href="tel:076531000"
-                  className="inline-flex h-[52px] w-full items-center justify-center gap-3 rounded-full border border-white/20 bg-white/[0.08] px-7 text-[15px] font-bold tracking-tight text-white backdrop-blur-md no-underline transition-all duration-200 hover:border-white/40 hover:bg-white/[0.14] hover:scale-[1.02] active:scale-95 sm:min-w-[320px]"
+                  className="inline-flex h-12 items-center justify-center gap-2.5 rounded-xl border border-white/25 bg-white/10 px-6 text-sm font-semibold text-white no-underline backdrop-blur-md transition-colors hover:border-white/40 hover:bg-white/15"
                 >
-                  <Phone className="h-[20px] w-[20px] stroke-[2.2] text-[#4ee4a5]" />
-                  <span>Call Center: (0765) 31000 / 112</span>
+                  <Phone className="h-4 w-4 text-[#E0A96D]" />
+                  <span>(0765) 31000 / 112</span>
                 </a>
               </div>
             </div>
