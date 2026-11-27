@@ -235,7 +235,7 @@ export default function AuthPage() {
             {/* Bottom Footer Stamp */}
             <div className="relative flex items-center justify-between border-t border-white/15 pt-5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/60">
               <span>Dinas Kesehatan Kota Dumai</span>
-              <span>UHC Kota Dumai</span>
+              
             </div>
           </aside>
 
