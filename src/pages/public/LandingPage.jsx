@@ -29,6 +29,11 @@ import { useAuth } from "@/context/AuthContext";
 
 const EASE = [0.16, 1, 0.3, 1];
 
+const CALL_CENTER_DISPLAY = "0811-7503-343";
+const CALL_CENTER_TEL = "tel:08117503343";
+const WHATSAPP_URL =
+  "https://wa.me/628117503343?text=Halo%20Admin%20Posko%20BPJS%20Dinas%20Kesehatan%20Kota%20Dumai,%20saya%20ingin%20bertanya%20seputar%20pendaftaran";
+
 // Tambahkan atau ganti foto pada daftar ini kapan saja
 const heroSlides = [
   {
@@ -260,6 +265,73 @@ function MovingBackdrop({
         style={{ backgroundImage: `url(${image})` }}
       />
       <div className={`absolute inset-0 backdrop-blur-[2px] ${scrimClassName}`} />
+    </div>
+  );
+}
+
+/* Tombol Logo WhatsApp Melayang (Ikon Resmi Presisi + Animasi Mengambang) */
+export function FloatingWhatsApp() {
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <div className="fixed bottom-5 right-5 z-50 sm:bottom-6 sm:right-6">
+      {/* Gelombang Pulse Halus */}
+      {!reduceMotion && (
+        <motion.span
+          aria-hidden="true"
+          animate={{
+            scale: [1, 1.36],
+            opacity: [0.45, 0],
+          }}
+          transition={{
+            duration: 2.5,
+            repeat: Infinity,
+            ease: "easeOut",
+          }}
+          className="pointer-events-none absolute inset-0 rounded-full bg-[#25D366]"
+        />
+      )}
+
+      <motion.a
+        href={WHATSAPP_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Hubungi WhatsApp Posko Layanan 0811-7503-343"
+        title="Chat WhatsApp Posko (0811-7503-343)"
+        animate={
+          reduceMotion
+            ? undefined
+            : {
+                y: [0, -5, 0],
+                rotate: [0, -3, 3, 0],
+              }
+        }
+        transition={{
+          y: {
+            duration: 2.8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          },
+          rotate: {
+            duration: 3.6,
+            repeat: Infinity,
+            repeatDelay: 2,
+            ease: "easeInOut",
+          },
+        }}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.94 }}
+        className="relative flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_10px_24px_-4px_rgba(37,211,102,0.55)] ring-2 ring-white/90 sm:h-15 sm:w-15"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+          className="h-8 w-8"
+        >
+          <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM12.05 20.15C10.57 20.15 9.11 19.75 7.84 19L7.54 18.82L4.42 19.64L5.25 16.6L5.06 16.29C4.24 14.97 3.8 13.45 3.8 11.91C3.81 7.37 7.5 3.68 12.05 3.68C14.25 3.68 16.31 4.54 17.87 6.1C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.59 20.15 12.05 20.15ZM16.57 14.01C16.32 13.89 15.11 13.29 14.88 13.21C14.66 13.13 14.49 13.09 14.33 13.33C14.17 13.58 13.69 14.13 13.55 14.3C13.41 14.46 13.26 14.48 13.01 14.36C12.76 14.23 11.97 13.97 11.02 13.13C10.28 12.47 9.79 11.66 9.64 11.41C9.5 11.16 9.63 11.03 9.75 10.91C9.86 10.8 10 10.62 10.12 10.48C10.24 10.33 10.29 10.23 10.37 10.07C10.45 9.9 10.41 9.76 10.35 9.63C10.29 9.51 9.79 8.29 9.59 7.8C9.39 7.32 9.18 7.38 9.03 7.38H8.55C8.39 7.38 8.12 7.44 7.89 7.69C7.67 7.94 7.03 8.53 7.03 9.75C7.03 10.97 7.92 12.15 8.04 12.31C8.16 12.48 9.79 14.98 12.28 16.05C12.87 16.31 13.33 16.46 13.69 16.57C14.29 16.76 14.83 16.73 15.26 16.67C15.74 16.6 16.73 16.07 16.94 15.49C17.15 14.91 17.15 14.42 17.08 14.31C17.02 14.21 16.82 14.13 16.57 14.01Z" />
+        </svg>
+      </motion.a>
     </div>
   );
 }
@@ -879,7 +951,7 @@ export default function LandingPage() {
 
               <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
                 <a
-                  href="https://wa.me/6281275000000?text=Halo%20Admin%20Posko%20BPJS%20Dinas%20Kesehatan%20Kota%20Dumai,%20saya%20ingin%20bertanya%20seputar%20pendaftaran"
+                  href={WHATSAPP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex h-12 items-center justify-center gap-2.5 rounded-xl bg-[#E0A96D] px-6 text-sm font-bold text-[#0A2540] no-underline transition-colors hover:bg-[#e8b882] active:scale-[0.99]"
@@ -889,17 +961,20 @@ export default function LandingPage() {
                 </a>
 
                 <a
-                  href="tel:076531000"
+                  href={CALL_CENTER_TEL}
                   className="inline-flex h-12 items-center justify-center gap-2.5 rounded-xl border border-white/25 bg-white/10 px-6 text-sm font-semibold text-white no-underline backdrop-blur-md transition-colors hover:border-white/40 hover:bg-white/15"
                 >
                   <Phone className="h-4 w-4 text-[#E0A96D]" />
-                  <span>(0765) 31000 / 112</span>
+                  <span>{CALL_CENTER_DISPLAY}</span>
                 </a>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Logo WhatsApp Melayang di Pojok Kanan Bawah */}
+      <FloatingWhatsApp />
     </div>
   );
 }
