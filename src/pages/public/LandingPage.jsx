@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
@@ -28,6 +28,38 @@ import faqBg from "@/assets/faq-bg.jpg";
 import { useAuth } from "@/context/AuthContext";
 
 const EASE = [0.16, 1, 0.3, 1];
+
+// Tambahkan atau ganti foto pada daftar ini kapan saja
+const heroSlides = [
+  {
+    id: "keluarga",
+    image: heroFamily,
+    tag: "Perlindungan Keluarga",
+    badge: "1 Akun · 1 KK",
+    title: "Jaminan kesehatan aktif untuk seluruh anggota keluarga.",
+  },
+  {
+    id: "puskesmas",
+    image: faskesBg,
+    tag: "Jejaring Puskesmas",
+    badge: "7 Kecamatan",
+    title: "Akses layanan kesehatan dekat dengan domisili warga Dumai.",
+  },
+  {
+    id: "digital",
+    image: advantagesBg,
+    tag: "Pendaftaran Daring",
+    badge: "Tanpa Antre",
+    title: "Pengajuan berkas dan pantau status verifikasi dari ponsel.",
+  },
+  {
+    id: "komitmen",
+    image: komitmenBg,
+    tag: "Dukungan APBD",
+    badge: "Rp 0 Iuran",
+    title: "Komitmen Pemerintah Kota Dumai untuk kesehatan masyarakat.",
+  },
+];
 
 const stats = [
   { value: "100%", label: "Cakupan semesta warga" },
@@ -234,10 +266,30 @@ function MovingBackdrop({
 
 export default function LandingPage() {
   const { user } = useAuth();
+  const reduceMotion = useReducedMotion();
   const registrationPath = user ? "/register" : "/login";
 
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const [selectedFacility, setSelectedFacility] = useState(0);
   const [openFaq, setOpenFaq] = useState(0);
+
+  const totalSlides = heroSlides.length;
+  const currentSlide = heroSlides[activeSlide];
+  const nextSlideItem = heroSlides[(activeSlide + 1) % totalSlides];
+
+  const handleNextSlide = () => {
+    setActiveSlide((prev) => (prev + 1) % totalSlides);
+  };
+
+  // Auto-slide halus (berhenti sementara saat kursor di atas foto)
+  useEffect(() => {
+    if (isPaused || reduceMotion) return;
+    const timer = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % totalSlides);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [isPaused, reduceMotion, totalSlides]);
 
   const featuredAdvantage = advantages[0];
   const secondaryAdvantages = advantages.slice(1);
@@ -245,7 +297,7 @@ export default function LandingPage() {
 
   return (
     <div className="overflow-hidden bg-[#F7F6F2] text-slate-900 selection:bg-[#0F4C81]/15 selection:text-[#0F4C81]">
-      {/* ── 1. HERO SECTION (Editorial Split + Warm Alabaster & Coastal Blue) ── */}
+      {/* ── 1. HERO SECTION ── */}
       <section className="relative isolate overflow-hidden">
         <MovingBackdrop
           image={faskesBg}
@@ -253,11 +305,11 @@ export default function LandingPage() {
           scrimClassName="bg-gradient-to-br from-[#F7F6F2]/96 via-[#F4F2EC]/90 to-[#EAE7DF]/82"
         />
 
-        <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-12 sm:px-6 sm:pb-24 sm:pt-20">
-          <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
-            {/* Kolom Kiri: Tipografi Tegas & Bersih */}
+        <div className="relative mx-auto max-w-[1200px] px-4 pb-16 pt-12 sm:px-6 sm:pb-24 sm:pt-20">
+          <div className="grid items-center gap-12 lg:grid-cols-[0.96fr_1.04fr] lg:gap-12">
+            {/* Kolom Kiri */}
             <div>
-              <h1 className="text-[clamp(2.45rem,4.7vw,3.95rem)] font-extrabold leading-[1.06] tracking-[-0.035em] text-slate-950">
+              <h1 className="text-[clamp(2.4rem,4.5vw,3.85rem)] font-extrabold leading-[1.06] tracking-[-0.035em] text-slate-950">
                 Perlindungan Kesehatan Gratis Warga Dumai.{" "}
                 <span className="mt-1 block text-[#0F4C81]">
                   100% Ditanggung APBD.
@@ -302,27 +354,102 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Kolom Kanan: Frame Editorial Tegak dengan Detail Coastal Navy */}
-            <Reveal className="relative mx-auto w-full max-w-[440px]">
-              <div className="overflow-hidden rounded-2xl bg-[#0A2540] text-white shadow-[0_24px_60px_-20px_rgba(10,37,64,0.28)]">
-                <div className="relative aspect-[4/3.8] w-full overflow-hidden">
+            {/* Kolom Kanan: Interactive Click-to-Next Photo Deck (Lebih Besar & Bersih) */}
+            <Reveal className="relative mx-auto w-full max-w-[590px] lg:max-w-none">
+              <div
+                onMouseEnter={() => setIsPaused(true)}
+                onMouseLeave={() => setIsPaused(false)}
+                className="relative pr-0 sm:pr-4"
+              >
+                {/* Layer Belakang: Tumpukan Kartu Berikutnya */}
+                <div
+                  onClick={handleNextSlide}
+                  aria-hidden="true"
+                  className="absolute right-0 top-5 hidden h-[88%] w-[94%] rotate-[2.5deg] cursor-pointer overflow-hidden rounded-3xl border border-slate-900/10 bg-slate-200 shadow-lg transition-transform duration-300 hover:rotate-[3.5deg] hover:translate-x-1 sm:block"
+                >
                   <img
-                    src={heroFamily}
-                    alt="Keluarga warga Kota Dumai di Puskesmas"
-                    className="h-full w-full object-cover object-center"
+                    src={nextSlideItem.image}
+                    alt=""
+                    className="h-full w-full object-cover opacity-75"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A2540] via-transparent to-transparent opacity-80" />
+                  <div className="absolute inset-0 bg-[#0A2540]/35" />
                 </div>
 
-                <div className="px-6 pb-6 pt-2">
-                  <div className="flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#E0A96D]">
-                    <span>Universal Health Coverage</span>
-                    <span>Kota Dumai</span>
+                {/* Layer Utama: Klik Langsung pada Gambar untuk Ganti Slide */}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={handleNextSlide}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleNextSlide();
+                    }
+                  }}
+                  aria-label="Klik gambar untuk melihat foto berikutnya"
+                  className="group relative cursor-pointer select-none overflow-hidden rounded-3xl bg-slate-900 shadow-[0_28px_70px_-20px_rgba(10,37,64,0.34)] ring-1 ring-black/10 transition-transform duration-200 active:scale-[0.99]"
+                >
+                  <div className="relative aspect-[4/3.65] w-full overflow-hidden">
+                    <AnimatePresence mode="wait">
+                      <motion.img
+                        key={currentSlide.id}
+                        src={currentSlide.image}
+                        alt={currentSlide.title}
+                        initial={{ opacity: 0, scale: 1.03 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.98 }}
+                        transition={{ duration: 0.42, ease: EASE }}
+                        className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+                      />
+                    </AnimatePresence>
+
+                    {/* Gradasi Halus untuk Keterbacaan Teks */}
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071828]/90 via-[#071828]/15 to-transparent" />
+
+                    {/* Top Bar: Counter & Badge */}
+                    <div className="pointer-events-none absolute inset-x-5 top-5 flex items-center justify-between gap-2">
+                      <span className="rounded-xl bg-white/90 px-3.5 py-1.5 font-mono text-xs font-bold text-slate-900 backdrop-blur-md">
+                        0{activeSlide + 1} / 0{totalSlides}
+                      </span>
+                      <span className="rounded-xl bg-[#0A2540]/85 px-3.5 py-1.5 text-xs font-semibold text-[#E0A96D] backdrop-blur-md">
+                        {currentSlide.badge}
+                      </span>
+                    </div>
+
+                    {/* Bottom Caption & Progress Bars di Dalam Foto */}
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 p-6 text-white sm:p-7">
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={currentSlide.id}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          transition={{ duration: 0.28, ease: EASE }}
+                        >
+                          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#E0A96D]">
+                            {currentSlide.tag}
+                          </p>
+                          <p className="mt-1.5 max-w-md text-base font-medium leading-snug text-white/95 sm:text-lg">
+                            {currentSlide.title}
+                          </p>
+                        </motion.div>
+                      </AnimatePresence>
+
+                      {/* Indikator Bar Minimalis */}
+                      <div className="mt-5 flex items-center gap-2">
+                        {heroSlides.map((slide, idx) => (
+                          <span
+                            key={slide.id}
+                            className={`h-1 rounded-full transition-all duration-300 ${
+                              idx === activeSlide
+                                ? "w-10 bg-[#E0A96D]"
+                                : "w-3 bg-white/35"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-200">
-                    Jaminan layanan kesehatan aktif untuk seluruh anggota
-                    keluarga warga Kota Dumai melalui dukungan APBD.
-                  </p>
                 </div>
               </div>
             </Reveal>
@@ -374,7 +501,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Bento Grid: 1 Kartu Utama Besar di Kiri + 2 Kartu Pendukung di Kanan */}
+          {/* Bento Grid */}
           <div className="mt-12 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
             {/* Kartu Utama (Coastal Navy) */}
             <Reveal>
@@ -465,7 +592,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── 3. ALUR PENDAFTARAN (Clean Architectural Steps di atas Deep Navy) ── */}
+      {/* ── 3. ALUR PENDAFTARAN ── */}
       <section
         id="alur"
         className="relative isolate overflow-hidden bg-[#081C2E] py-20 text-white sm:py-28"
