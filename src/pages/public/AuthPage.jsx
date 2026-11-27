@@ -559,7 +559,7 @@ export default function AuthPage() {
                   <button
                     type="button"
                     onClick={() => changeTab("register")}
-                    className="font-semibold text-primary-700 hover:text-primary-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                    className="font-semibold text-red-700 hover:text-red-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
                   >
                     Daftar akun
                   </button>
