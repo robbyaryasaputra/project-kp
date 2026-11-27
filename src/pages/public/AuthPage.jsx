@@ -150,15 +150,15 @@ export default function AuthPage() {
 
       <div className="relative z-10 w-full max-w-5xl">
         {/* ── Top Floating Navigation ── */}
-        <div className="mb-4 flex items-center px-1 sm:mb-6">
-          <Link
-            to="/"
-            className="group inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-white/90 shadow-sm backdrop-blur-md no-underline transition-all duration-200 hover:border-white/40 hover:bg-white/20 hover:text-white hover:shadow-md active:scale-95"
-          >
-            <ArrowLeft className="h-3.5 w-3.5 transition-transform duration-200 group-hover:-translate-x-1" />
-            <span>Kembali ke Beranda</span>
-          </Link>
-        </div>
+        <div className="mb-4 flex items-center sm:mb-6">
+  <Link
+    to="/"
+    className="group inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-4 py-2 text-xs font-semibold text-white shadow-sm backdrop-blur-md no-underline transition-all duration-200 hover:border-[#E0A96D]/60 hover:bg-white/20 hover:text-[#E0A96D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E0A96D] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A2540] active:scale-[0.98] sm:text-sm"
+  >
+    <ArrowLeft className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" />
+    <span>Kembali ke Beranda</span>
+  </Link>
+</div>
 
         {/* ── The Floating Master Card ── */}
         <motion.div
